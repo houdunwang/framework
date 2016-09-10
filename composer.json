@@ -1,0 +1,12 @@
+{
+  "name": "houdunwang/framework",
+  "description": "Hdphp Framework (Kernel)",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "houdunwang",
+      "email": "2300071698@qq.com"
+    }
+  ],
+  "require": {}
+}
