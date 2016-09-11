@@ -2,6 +2,7 @@
   "name": "houdunwang/framework",
   "description": "Hdphp Framework (Kernel)",
   "license": "MIT",
+  "type": "project",
   "authors": [
     {
       "name": "houdunwang",
