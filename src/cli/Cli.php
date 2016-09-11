@@ -15,7 +15,7 @@ class Cli {
 		array_shift( $_SERVER['argv'] );
 		$info = explode( ':', array_shift( $_SERVER['argv'] ) );
 		//类文件
-		$file = 'hdphp/cli/' . ucfirst( $info[0] ) . '/Command.php';
+		$file = __DIR__.'/' . ucfirst( $info[0] ) . '/Command.php';
 		if ( ! is_file( $file ) ) {
 			self::error( 'Command does not exist' );
 		} else {

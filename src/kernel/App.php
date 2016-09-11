@@ -73,7 +73,7 @@ class App extends Container {
 	public function cli() {
 		//命令模式
 		if ( $_SERVER['SCRIPT_NAME'] == 'hd' ) {
-			require_once HDPHP_PATH . '/cli/Cli.php';
+			require_once __DIR__ . '/../cli/Cli.php';
 			\hdphp\cli\Cli::run();
 			exit;
 		}
