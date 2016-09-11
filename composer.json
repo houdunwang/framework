@@ -13,9 +13,7 @@
   },
   "extra": {
     "installer-paths": {
-      "hdphp": [
-        "vendor/houdunwang/framework"
-      ]
+      "hdphp": "vendor/houdunwang/framework"
     }
   }
 }
