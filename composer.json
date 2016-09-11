@@ -11,17 +11,12 @@
   ],
   "require": {
   },
-  "extra": {
-    "installer-paths": {
-      "hdphp": "vendor/houdunwang/framework"
-    }
-  },
   "autoload": {
     "files": [
-      "houdunwang/framework/kernel/Functions.php"
+      "src/kernel/Functions.php"
     ],
     "psr-4": {
-      "hdphp\\": "houdunwang/framework/"
+      "hdphp\\": "src/"
     }
   }
 }
