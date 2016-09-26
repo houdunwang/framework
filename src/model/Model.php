@@ -56,8 +56,12 @@ class Model implements ArrayAccess, Iterator {
 	const MODEL_UPDATE = 2;
 	//全部情况下处理
 	const MODEL_BOTH = 3;
+	//允许填充字段
+	protected $allowFill = [ ];
+	//禁止填充字段
+	protected $denyFill = [ ];
 	//模型记录
-	public static $links;
+	protected static $links;
 	//数据库连接
 	protected $connect;
 	//类名
@@ -71,7 +75,7 @@ class Model implements ArrayAccess, Iterator {
 	//验证错误
 	protected $error;
 	//模型数据
-	public $data = [ ];
+	protected $data = [ ];
 	//自动验证
 	protected $validate = [ ];
 	//自动完成
@@ -149,7 +153,7 @@ class Model implements ArrayAccess, Iterator {
 	 *
 	 * @return bool 验证状态
 	 */
-	private function unique( $field, $value, $param, $data ) {
+	final protected function unique( $field, $value, $param, $data ) {
 		//表主键
 		$db = Db::table( $this->table );
 		if ( isset( $data[ $this->pk ] ) ) {
@@ -163,8 +167,8 @@ class Model implements ArrayAccess, Iterator {
 	/**
 	 * 自动验证
 	 *
-	 * @param $data 数据
-	 * @param $type 类型 1添加 2更新
+	 * @param array $data 数据
+	 * @param int $type 类型 1添加 2更新
 	 *
 	 * @return bool
 	 */
@@ -241,7 +245,7 @@ class Model implements ArrayAccess, Iterator {
 	 * 自动完成处理
 	 *
 	 * @param $data 数据
-	 * @param $type 时机
+	 * @param int $type 时机
 	 *
 	 * @return mixed
 	 */
@@ -332,46 +336,6 @@ class Model implements ArrayAccess, Iterator {
 	}
 
 	/**
-	 * 禁止更新字段检测处理
-	 *
-	 * @param array $data 数据
-	 *
-	 * @return array
-	 */
-	private function denyUpdateFieldDispose( array $data ) {
-		$dispose = $data;
-		if ( ! empty( $this->denyUpdateFields ) ) {
-			foreach ( (array) $dispose as $field => $v ) {
-				if ( in_array( $field, $this->denyUpdateFields ) ) {
-					unset( $data[ $field ] );
-				}
-			}
-		}
-
-		return $data;
-	}
-
-	/**
-	 * 禁止添加字段检测处理
-	 *
-	 * @param array $data 数据
-	 *
-	 * @return array
-	 */
-	private function denyInsertFieldDispose( array $data ) {
-		$dispose = $data;
-		if ( ! empty( $this->denyInsertFields ) ) {
-			foreach ( (array) $dispose as $field => $v ) {
-				if ( in_array( $field, $this->denyInsertFields ) ) {
-					unset( $data[ $field ] );
-				}
-			}
-		}
-
-		return $data;
-	}
-
-	/**
 	 * 验证令牌
 	 *
 	 * @return bool
@@ -425,57 +389,24 @@ class Model implements ArrayAccess, Iterator {
 		return $data;
 	}
 
-	/**
-	 * 添加数据并返回实例
-	 *
-	 * @param array $data 添加的数据
-	 *
-	 * @return bool
-	 */
-	final public function add( array $data = [ ] ) {
-		if ( ! $data = $this->create( $data, 1 ) ) {
-			return FALSE;
-		}
-		if ( empty( $data ) ) {
-			$this->error = '没有数据用于添加';
-
-			return FALSE;
-		}
-		//更新时间
-		if ( $this->timestamps === TRUE ) {
-			$data['created_at'] = NOW;
-		}
-		//添加前操作
-		if ( method_exists( $this, '_before_add' ) ) {
-			$this->_before_add( $data );
-		}
-		if ( $this->db->insert( $data ) ) {
-			if ( method_exists( $this, '_after_add' ) ) {
-				$this->_after_add();
-			}
-
-			return $this->db->getInsertId() ?: TRUE;
-		}
-
-		return FALSE;
-	}
 
 	/**
 	 * 创建数据对象
 	 *
 	 * @param array $data 生成对象数据
-	 * @param string $type 1 插入 2 更新
 	 *
 	 * @return array|bool
 	 */
-	final public function create( array $data = [ ], $type = NULL ) {
-		//如果数据不存在时使用$_POST
-		if ( empty( $data ) ) {
-			$data = $this->data ?: $_POST;
-		} else if ( is_object( $data ) ) {
-			//对象时获取对象属性
-			$data = get_object_vars( $data );
+	final public function create( array $data = [ ] ) {
+		if ( ! empty( $data ) ) {
+			if ( empty( $this->allowFill ) ) {
+				$data = \Arr::filter_by_keys( $data, $this->allowFill, 1 );
+			}
+			if ( empty( $this->denyFill ) ) {
+				$data = \Arr::filter_by_keys( $data, $this->allowFill, 0 );
+			}
 		}
+		$data = $data ?: $this->data;
 		//令牌验证
 		if ( ! $this->checkToken( $data ) ) {
 			$this->error = '表单令牌错误';
@@ -483,15 +414,14 @@ class Model implements ArrayAccess, Iterator {
 			return FALSE;
 		}
 		//动作类型  1 插入 2 更新
-		$type = $type ?: ( empty( $data[ $this->pk ] ) ? self::MODEL_INSERT : self::MODEL_UPDATE );
-		//禁止更新字段处理
-		$data = $type == 2 ? $this->denyUpdateFieldDispose( $data ) : $data;
-		//禁止添加字段处理
-		$data = $type == 1 ? $this->denyInsertFieldDispose( $data ) : $data;
-		if ( empty( $data ) ) {
-			$this->error = '数据为空无法进行模型操作';
-
-			return FALSE;
+		$type = empty( $data[ $this->pk ] ) ? self::MODEL_INSERT : self::MODEL_UPDATE;
+		//修改更新时间
+		if ( $this->timestamps === TRUE ) {
+			$data['updated_at'] = NOW;
+			if ( $type == self::MODEL_INSERT ) {
+				//更新时间
+				$data['created_at'] = NOW;
+			}
 		}
 		//自动完成
 		$data = $this->autoOperation( $data, $type );
@@ -509,45 +439,47 @@ class Model implements ArrayAccess, Iterator {
 	}
 
 	/**
-	 * 更新一条数据,更新数据中必须存在主键
+	 * 更新或添加数据
 	 *
-	 * @param array $data 数据
+	 * @param array $data 批量添加的数据
 	 *
 	 * @return bool
+	 * @throws \Exception
 	 */
 	final public function save( array $data = [ ] ) {
-		if ( ! $data = $this->create( $data, 2 ) ) {
+		if ( ! $data = $this->create( $data ) ) {
 			return FALSE;
 		}
 		if ( empty( $data ) ) {
-			$this->error = '没有更新数据';
+			throw new \Exception( '没有操作的数据' );
+		}
 
-			return FALSE;
-		}
-		//更新时间
-		if ( $this->timestamps === TRUE ) {
-			$data['updated_at'] = NOW;
-		}
 		//更新条件检测
-		if ( empty( $data[ $this->pk ] ) ) {
-			$this->error = '模型的save方法的数据必须设置条件';
+		$action = empty( $data[ $this->pk ] ) ? 'insert' : 'update';
 
-			return FALSE;
-		} else {
-			$this->db->where( $this->pk, $data[ $this->pk ] );
+		return $this->db->$action( $data );
+	}
+
+	/**
+	 * 删除数据
+	 *
+	 * @param null $id 编号
+	 *
+	 * @return bool
+	 */
+	final public function destory() {
+		//没有查询参数如果模型数据中存在主键值,以主键值做删除条件
+		if ( isset( $this->data[ $this->pk ] ) ) {
+			$this->where( $this->pk, $this->data[ $this->pk ] );
 		}
 
-		//更新前操作
-		if ( method_exists( $this, '_before_save' ) ) {
-			$this->_before_save( $data );
-		}
-		$result = $this->db->update( $data );
-		//更新后操作
-		if ( method_exists( $this, '_after_save' ) ) {
-			$this->_after_save();
+		if ( $status = $this->db->delete( $this->data[ $this->pk ] ) ) {
+			$this->data( [ ] );
+
+			return TRUE;
 		}
 
-		return $result;
+		return $status;
 	}
 
 	/**
@@ -558,48 +490,6 @@ class Model implements ArrayAccess, Iterator {
 		$this->updated_at = time();
 
 		return $this->save();
-	}
-
-	/**
-	 * 删除数据
-	 *
-	 * @param null $id 编号
-	 *
-	 * @return bool
-	 */
-	final public function delete( $id = NULL ) {
-		//没有查询参数如果模型数据中存在主键值,以主键值做删除条件
-		if ( empty( $id ) && ! $this->getQueryParams( 'where' ) ) {
-			if ( isset( $this->data[ $this->pk ] ) ) {
-				$this->where( $this->pk, $this->data[ $this->pk ] );
-			}
-		}
-		//删除前操作
-		if ( method_exists( $this, '_before_delete' ) ) {
-			$this->_before_delete();
-		}
-		if ( $status = $this->db->delete( $id ) ) {
-			//删除后操作
-			if ( method_exists( $this, '_after_delete' ) ) {
-				$this->_after_delete();
-			}
-		}
-
-		return $status;
-	}
-
-	/**
-	 * 记录不存在才新增
-	 *
-	 * @param $param 条件
-	 * @param $data 数据
-	 *
-	 * @return bool
-	 */
-	final public function firstOrCreate( $param, $data ) {
-		if ( $data = $this->create( $data ) ) {
-			return $this->db->firstOrCreate( $param, $data );
-		}
 	}
 
 	//获取模型值

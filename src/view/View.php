@@ -19,6 +19,8 @@ class View {
 	public $tpl;
 	//编译文件
 	public $compile;
+	//缓存目录
+	protected $cacheDir;
 
 	/**
 	 * 解析模板
@@ -30,52 +32,26 @@ class View {
 	 * @return bool|string
 	 * @throws Exception
 	 */
-	public function make( $tpl = '', $expire = 0, $show = TRUE ) {
+	public function make( $tpl = '', $expire = 0 ) {
+		$this->cacheDir = ROOT_PATH . '/storage/view/cache';
 		//模板文件
-		if ( ! $this->tpl = $this->getTemplateFile( $tpl ) ) {
-			return FALSE;
-		}
+		$this->tpl = $this->getTemplateFile( $tpl );
 		//缓存标识
 		$cacheName = md5( $_SERVER['REQUEST_URI'] . $this->tpl );
 		//缓存有效
-		if ( $expire > 0 && $content = Cache::dir( ROOT_PATH . '/storage/view/cache' )->get( $cacheName ) ) {
-			if ( $show ) {
-				die( $content );
-			} else {
-				return $content;
-			}
+		if ( $expire > 0 && $content = Cache::dir( $this->cacheDir )->get( $cacheName ) ) {
+			return $this;
 		}
-
 		//编译文件
-		$this->compile = 'storage/view/' . preg_replace( '/[^\w]/', '_', $this->tpl ) . '_' . substr( md5( $this->tpl ), 0, 5 ) . '.php';
+		$this->compile = ROOT_PATH . '/storage/view/' . preg_replace( '/[^\w]/', '_', $this->tpl ) . '_' . substr( md5( $this->tpl ), 0, 5 ) . '.php';
 		//编译文件
 		$this->compileFile();
-		//释放变量到全局
-		if ( ! empty( self::$vars ) ) {
-			extract( self::$vars );
-		}
-		//获取解析结果
-		ob_start();
-		require( $this->compile );
-		$content = ob_get_clean();
-
+		//创建缓存文件
 		if ( $expire > 0 ) {
-			//缓存
-			if ( ! Cache::dir( 'storage/view/cache' )->set( $cacheName, $content, $expire ) ) {
-				throw new Exception( "创建缓存失效" );
-			}
+			Cache::dir( $this->cacheDir )->set( $cacheName, $content, $expire );
 		}
-		if ( $show ) {
-			echo $content;
-			exit;
-		} else {
-			return $content;
-		}
-	}
 
-	//获取显示内容
-	public function fetch( $tpl = '' ) {
-		return $this->make( $tpl, 0, FALSE );
+		return $this;
 	}
 
 	/**
@@ -87,38 +63,24 @@ class View {
 	 * @throws Exception
 	 */
 	public function getTemplateFile( $file ) {
-		//添加后缀
-		if ( ! empty( $file ) ) {
-			$file = preg_match( '/\.[a-z]+$/i', $file ) ? $file : $file . C( 'view.prefix' );
-		}
+		$file = $file ? str_replace( '.', '/', $file ) : $file;
 		if ( is_file( $file ) ) {
 			return $file;
-		} else if ( ! is_file( $file ) ) {
-			if ( defined( 'MODULE' ) ) {
-				//模块视图文件夹
-				$f = strtolower( MODULE_PATH . '/view/' . CONTROLLER ) . '/' . ( $file ?: ACTION . C( 'view.prefix' ) );
-
-				if ( is_file( $f ) ) {
-					return $f;
-				}
-
-				$f = MODULE_PATH . '/view/' . $file;
-				if ( is_file( $f ) ) {
-					return $f;
-				}
-			} else {
-				//路由中使用回调函数执行View::make()时，因为没有MODULE
-				$f = C( 'view.path' ) . '/' . $file;
-				if ( is_file( $f ) ) {
-					return $f;
-				}
+		}
+		if ( defined( 'MODULE' ) ) {
+			//模块视图文件夹
+			$f = strtolower( MODULE_PATH . '/view/' . CONTROLLER ) . '/' . ( $file ?: ACTION ) . c( 'view.prefix' );
+			if ( is_file( $f ) ) {
+				return $f;
+			}
+		} else {
+			//路由访问时
+			$f = ROOT_PATH . '/' . c( 'view.path' ) . '/' . $file . c( 'view.prefix' );
+			if ( is_file( $f ) ) {
+				return $f;
 			}
 		}
-		if ( DEBUG ) {
-			throw new Exception( "模板不存在:$f" );
-		} else {
-			return FALSE;
-		}
+		throw new Exception( "模板不存在:$f" );
 	}
 
 	/**
@@ -138,7 +100,7 @@ class View {
 
 	//编译文件
 	private function compileFile() {
-		$status = DEBUG || ! file_exists( $this->compile )
+		$status = Config::get( 'app.debug' ) || ! file_exists( $this->compile )
 		          || ! is_file( $this->compile )
 		          || ( filemtime( $this->tpl ) > filemtime( $this->compile ) );
 		if ( $status ) {
@@ -157,7 +119,7 @@ class View {
 	/**
 	 * 分配变量
 	 *
-	 * @param $name 变量名
+	 * @param mixed $name 变量名
 	 * @param string $value 值
 	 *
 	 * @return $this
@@ -172,5 +134,14 @@ class View {
 		}
 
 		return $this;
+	}
+
+	//显示模板
+	public function __toString() {
+		extract( self::$vars );
+		ob_start();
+		require( $this->compile );
+
+		return ob_get_clean();
 	}
 }

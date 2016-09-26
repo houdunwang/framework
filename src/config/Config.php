@@ -15,7 +15,7 @@ class Config {
 	protected $items = [ ];
 
 	public function __construct() {
-		foreach ( glob( ROOT_PATH . DS . 'system/config/*' ) as $file ) {
+		foreach ( glob( ROOT_PATH . '/system/config/*' ) as $file ) {
 			$info = pathinfo( $file );
 			$this->set( $info['filename'], require $file );
 		}

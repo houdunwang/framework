@@ -14,7 +14,7 @@ class Error {
 	private $app;
 
 	public function __construct( $app ) {
-//		error_reporting( 0 );
+		error_reporting( 0 );
 		$this->app = $app;
 
 	}
@@ -28,10 +28,10 @@ class Error {
 	//自定义异常理
 	public function exception( $e ) {
 		Log::write( $e->getMessage(), 'EXCEPTION' );
-		if ( DEBUG ) {
+		if ( c( 'app.debug' ) ) {
 			require __DIR__ . '/view/exception.php';
 		} else {
-			require c( "view.bug" );
+			_404();
 		}
 	}
 
@@ -44,11 +44,11 @@ class Error {
 			case E_DEPRECATED:
 				break;
 			default:
-				if ( DEBUG ) {
+				if ( c( 'app.debug' ) ) {
 					require __DIR__ . '/view/debug.php';
 				} else {
 					class_exists( 'Log', FALSE ) && Log::write( $msg, $this->errorType( $errno ) );
-					require c( "view.bug" );
+					_404();
 				}
 		}
 	}

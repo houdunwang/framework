@@ -14,6 +14,13 @@ if ( ! function_exists( 'tablename' ) ) {
 		return c( 'database.prefix' ) . $table;
 	}
 }
+
+//显示模板
+if ( ! function_exists( 'view' ) ) {
+	function view( $tpl = '' ) {
+		return View::make( $tpl );
+	}
+}
 /**
  * 生成url
  *
@@ -116,6 +123,15 @@ if ( ! function_exists( 'm' ) ) {
 if ( ! function_exists( 'p' ) ) {
 	function p( $var ) {
 		echo "<pre>" . print_r( $var, TRUE ) . "</pre>";
+	}
+}
+
+//打印数据有数据类型
+if ( ! function_exists( 'dd' ) ) {
+	function dd( $var ) {
+		ob_start();
+		var_dump( $var );
+		echo "<pre>" . ob_get_clean() . "</pre>";
 	}
 }
 

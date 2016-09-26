@@ -118,4 +118,31 @@ class Arr {
 
 		return $tmp;
 	}
+
+	/**
+	 * 根据下标过滤数据元素
+	 * @param array $data 原数组数据
+	 * @param $keys 参数的下标
+	 * @param int $type 1 在$keys时过滤  0 不在时过滤
+	 *
+	 * @return array
+	 */
+	public function filter_by_keys( array $data, $keys, $type = 1 ) {
+		$tmp = $data;
+		foreach ( $data as $k => $v ) {
+			if ( $type == 1 ) {
+				//存在时过滤
+				if ( in_array( $k, $keys ) ) {
+					unset( $tmp[ $k ] );
+				}
+			} else {
+				//不在时过滤
+				if ( ! in_array( $k, $keys ) ) {
+					unset( $tmp[ $k ] );
+				}
+			}
+		}
+
+		return $tmp;
+	}
 }

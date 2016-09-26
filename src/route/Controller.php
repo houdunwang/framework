@@ -42,8 +42,8 @@ class Controller {
 		define( 'MODULE', $param[0] );
 		define( 'CONTROLLER', ucfirst( $param[1] ) );
 		define( 'ACTION', $param[2] );
-		define( 'MODULE_PATH', APP_PATH . '/' . MODULE );
-		define( 'VIEW_PATH', defined( 'MODULE_PATH' ) ? MODULE_PATH . '/' . 'view' : C( 'view.path' ) );
+		define( 'MODULE_PATH', ROOT_PATH . '/app/' . MODULE );
+		define( 'VIEW_PATH', MODULE_PATH . '/' . 'view' );
 		define( '__VIEW__', __ROOT__ . '/' . rtrim( VIEW_PATH, '/' ) );
 		self::action();
 	}
@@ -52,16 +52,12 @@ class Controller {
 	private static function action() {
 		//禁止使用模块检测
 		if ( in_array( MODULE, C( 'http.deny_module' ) ) ) {
-			_404();
+			throw new Exception( "模块禁止访问" );
 		}
-		$class = APP . '\\' . MODULE . '\\controller\\' . CONTROLLER;
+		$class = 'app\\' . MODULE . '\\controller\\' . CONTROLLER;
 		//控制器不存在
 		if ( ! class_exists( $class ) ) {
-			if ( DEBUG ) {
-				throw new Exception( "{$class} 不存在" );
-			} else {
-				_404();
-			}
+			throw new Exception( "{$class} 不存在" );
 		}
 		$controller = Route::$app->make( $class, TRUE );
 		$action     = method_exists( $controller, ACTION ) ? ACTION : '__empty';
@@ -76,15 +72,11 @@ class Controller {
 					if ( IS_AJAX ) {
 						\Response::ajax( $result );
 					} else {
-						die( $result );
+						echo ( $result );
 					}
 				}
 			} else {
-				if ( DEBUG ) {
-					throw new ReflectionException( '动作不存在' );
-				} else {
-					success( '页面不存在', __ROOT__, 'error' );
-				}
+				throw new ReflectionException( '请求地址不存在' );
 			}
 
 		} catch ( ReflectionException $e ) {

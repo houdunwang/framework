@@ -90,6 +90,11 @@ class Request {
 		}
 	}
 
+	//检测请求类型
+	public function isMethod( $method ) {
+
+	}
+
 	//客户端IP
 	public function ip( $type = 0 ) {
 		$type = intval( $type );
@@ -134,7 +139,7 @@ class Request {
 		if ( IS_WEIXIN ) {
 			return TRUE;
 		}
-		if ( !empty( $_GET['mobile'] ) ) {
+		if ( ! empty( $_GET['mobile'] ) ) {
 			return TRUE;
 		}
 		$_SERVER['ALL_HTTP'] = isset( $_SERVER['ALL_HTTP'] ) ? $_SERVER['ALL_HTTP'] : '';

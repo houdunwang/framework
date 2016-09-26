@@ -90,24 +90,32 @@ class Query {
 				$this->where( $pri, '=', $data[ $pri ] );
 			}
 		}
+		//必须有条件才可以更新
+		if ( $this->build()->getBindExpression( 'where' ) ) {
+			return $this->connection->execute( $this->build()->update(), $this->build()->getUpdateParams() );
+		}
 
-		return $this->connection->execute( $this->build()->update(), $this->build()->getUpdateParams() );
+		return FALSE;
 	}
 
 	/**
 	 * 删除记录
 	 *
-	 * @param string $id
+	 * @param mixed $id
 	 *
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function delete( $id = '' ) {
+	public function delete( $id = [ ] ) {
 		if ( ! empty( $id ) ) {
 			$this->whereIn( $this->connection->getPrimaryKey(), is_array( $id ) ? $id : explode( ',', $id ) );
 		}
+		//必须有条件才可以删除
+		if ( $this->build()->getBindExpression( 'where' ) ) {
+			return $this->connection->execute( $this->build()->delete(), $this->build()->getDeleteParams() );
+		}
 
-		return $this->connection->execute( $this->build()->delete(), $this->build()->getDeleteParams() );
+		return FALSE;
 	}
 
 	//记录不存在时创建
@@ -150,11 +158,15 @@ class Query {
 		$pri = $this->connection->getPrimaryKey();
 		if ( $pri && $id ) {
 			$data = $this->where( $pri, '=', $id )->first();
+			if ( $this->connection->model ) {
+				return $this->connection->model->data( $data );
+			}
 
 			return $data;
 		}
 	}
 
+	//查找一条数据
 	public function first( $id = NULL ) {
 		if ( $id ) {
 			$this->where( $this->connection->getPrimaryKey(), $id );
@@ -180,7 +192,7 @@ class Query {
 	}
 
 	public function lists( $field ) {
-		$result = $this->field($field)->get();
+		$result = $this->field( $field )->get();
 		$data   = [ ];
 		if ( ! empty( $result ) ) {
 			$field = explode( ',', $field );

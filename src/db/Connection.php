@@ -111,8 +111,9 @@ abstract class Connection implements ArrayAccess, Iterator {
 
 	/**
 	 * 获取连接
+	 * @param bool $type true写入 false 读
 	 *
-	 * @param bool $type true写入 false 读取
+	 * @return mixed
 	 */
 	protected function getLink( $type = TRUE ) {
 		static $links = [ ];
