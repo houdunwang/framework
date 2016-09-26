@@ -7,9 +7,9 @@
  * |    WeChat: aihoudun
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
-namespace hdphp\String;
+namespace hdphp\str;
 
-class String {
+class Str {
 	//gbk字符转utf8字符
 	public function gbkToUtf8( $string ) {
 		return iconv( 'gbk', 'utf-8', $string );
@@ -17,6 +17,7 @@ class String {
 
 	/**
 	 * PHP代码压缩/去空白注释
+	 *
 	 * @param $content
 	 *
 	 * @return string
