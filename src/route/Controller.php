@@ -44,7 +44,6 @@ class Controller {
 		define( 'ACTION', $param[2] );
 		define( 'MODULE_PATH', ROOT_PATH . '/app/' . MODULE );
 		define( 'VIEW_PATH', MODULE_PATH . '/' . 'view' );
-		define( '__VIEW__', __ROOT__ . '/' . rtrim( VIEW_PATH, '/' ) );
 		self::action();
 	}
 
