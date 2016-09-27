@@ -23,7 +23,7 @@ class Log {
     public $log = [ ];
 
     public function __construct() {
-        $this->dir = ROOT_PATH . DS . 'storage'.DS.'log';
+        $this->dir = ROOT_PATH .  '/storage/log';
         is_dir( $this->dir ) or mkdir( $this->dir, 0755, TRUE );
     }
 
@@ -62,7 +62,7 @@ class Log {
      * @return void
      */
     public function write( $message, $level = self::ERROR ) {
-        $file = $this->dir . DS. date( 'Y_m_d' ) . '.log';
+        $file = $this->dir . '/'. date( 'Y_m_d' ) . '.log';
         error_log( date( "[ c ]" ) . "{$level}: {$message}" . PHP_EOL, 3, $file, NULL );
     }
 }

@@ -1,27 +1,32 @@
 <?php
 /** .-------------------------------------------------------------------
- * |  Software: [HDCMS framework]
- * |      Site: www.hdcms.com
+ * |  Software: [HDPHP framework]
+ * |      Site: www.hdphp.com
  * |-------------------------------------------------------------------
  * |    Author: 向军 <2300071698@qq.com>
  * |    WeChat: aihoudun
- * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
+ * | Copyright (c) 2012-2019, www.hdphp.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
-namespace hdphp\request;
+namespace hdphp\database;
+
 
 use hdphp\kernel\ServiceProvider;
 
-class RequestProvider extends ServiceProvider {
+/**
+ * Class SchemaProvider
+ * @package hdphp\db
+ */
+class SchemaProvider extends ServiceProvider {
 	//延迟加载
-	public $defer = true;
+	public $defer = FALSE;
 
 	public function boot() {
-		define( 'IS_MOBILE', \Request::isMobile() );
+
 	}
 
 	public function register() {
-		$this->app->single( 'Request', function ( $app ) {
-			return new Request( $app );
-		} );
+		$this->app->bind( 'Schema', function ( $app ) {
+			return new Schema( $app );
+		}, TRUE );
 	}
 }

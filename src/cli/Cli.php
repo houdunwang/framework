@@ -7,26 +7,19 @@
  * @author 向军 <2300071698@qq.com>
  */
 class Cli {
-	/**
-	 * 运行
-	 */
+	//运行
 	public static function run() {
 		//去掉hd
 		array_shift( $_SERVER['argv'] );
 		$info = explode( ':', array_shift( $_SERVER['argv'] ) );
-		//类文件
-		$file = __DIR__ . '/' . $info[0] . '/' . ucfirst( $info[1] ) . '.php';
-		if ( ! is_file( $file ) ) {
-			self::error( 'Command does not exist' );
-		}
 		//命令类
-		$class = 'hdphp\\cli\\' . $info[0] . '\\' . ucfirst( $info[1] );
+		$class = 'hdphp\cli\\' . $info[0] . '\\' . ucfirst( $info[1] );
 		//实例
-		$instance = new $class();
-		if ( method_exists( $instance, 'run' ) ) {
+		if ( class_exists( $class ) ) {
+			$instance = new $class();
 			call_user_func_array( [ $instance, 'run' ], $_SERVER['argv'] );
 		} else {
-			self::error( "$info[1] method not found\n" );
+			self::error( 'Command does not exist' );
 		}
 	}
 

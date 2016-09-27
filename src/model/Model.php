@@ -1,4 +1,4 @@
-<?php
+<?php namespace hdphp\model;
 /** .-------------------------------------------------------------------
  * |  Software: [HDCMS framework]
  * |      Site: www.hdcms.com
@@ -7,8 +7,6 @@
  * |    WeChat: aihoudun
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
-namespace hdphp\model;
-
 use ArrayAccess;
 use hdphp\traits\HdArrayAccess;
 use Iterator;
@@ -105,14 +103,19 @@ class Model implements ArrayAccess, Iterator {
 		}
 	}
 
-	//设置模型表
+	/**
+	 * 设置模型表
+	 */
 	final protected function setTable() {
 		if ( empty( $this->table ) ) {
 			$this->table = strtolower( preg_replace( '/.([A-Z])/', '_\1', $this->model ) );
 		}
 	}
 
-	//获取表名
+	/**
+	 * 获取表名
+	 * @return mixed
+	 */
 	final public function getTableName() {
 		return $this->table;
 	}

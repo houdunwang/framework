@@ -43,6 +43,7 @@ return [
 		'hdphp\form\FormProvider',
 		'hdphp\tool\ToolProvider',
 		'hdphp\cloud\CloudProvider',
+		'hdphp\database\SchemaProvider',
 	],
 
 	//服务外观
@@ -88,5 +89,6 @@ return [
 		'Form'       => 'hdphp\form\FormFacade',
 		'Tool'       => 'hdphp\tool\ToolFacade',
 		'Cloud'      => 'hdphp\cloud\CloudFacade',
+		'Schema'     => 'hdphp\database\SchemaFacade',
 	],
 ];

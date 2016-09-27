@@ -21,7 +21,7 @@ class ImageProvider extends ServiceProvider {
 
 	public function register() {
 		$this->app->single( 'Image', function ( $app ) {
-			return new \Hdphp\Image\Image( $app );
+			return new Image( $app );
 		} );
 	}
 }

@@ -32,7 +32,6 @@ class Config {
 			$this->set( 'database.user', $config['DB_USER'] );
 			$this->set( 'database.password', $config['DB_PASSWORD'] );
 			$this->set( 'database.database', $config['DB_DATABASE'] );
-			$this->set( 'database.prefix', $config['DB_PREFIX'] );
 		}
 	}
 

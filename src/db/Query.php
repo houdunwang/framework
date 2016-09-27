@@ -1,17 +1,16 @@
-<?php
+<?php namespace hdphp\db;
+
 /** .-------------------------------------------------------------------
- * |  Software: [HDCMS framework]
- * |      Site: www.hdcms.com
+ * |  Software: [HDPHP framework]
+ * |      Site: www.hdphp.com
  * |-------------------------------------------------------------------
  * |    Author: 向军 <2300071698@qq.com>
  * |    WeChat: aihoudun
- * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
+ * | Copyright (c) 2012-2019, www.hdphp.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
 
-namespace hdphp\db;
-
-use hdphp\db\Connection;
 use Exception;
+use hdphp\db\connection\DbInterface;
 
 class Query {
 	//数据库连接
@@ -19,13 +18,17 @@ class Query {
 	//sql分析实例
 	protected $build;
 
-	public function __construct( Connection $connection ) {
+	public function __construct( DbInterface $connection ) {
 		$this->connection = $connection;
 	}
 
+	/**
+	 * 设置操作驱动
+	 * @return mixed
+	 */
 	public function build() {
 		if ( ! $this->build ) {
-			$driver      = 'hdphp\db\build\\' . ucfirst( Config::get( 'database.driver' ) );
+			$driver      = 'hdphp\db\build\\' . ucfirst( c( 'database.driver' ) );
 			$this->build = new $driver( $this->connection );
 		}
 
@@ -34,19 +37,17 @@ class Query {
 
 	//获取表前缀
 	protected function getPrefix() {
-		return \Config::get( 'database.prefix' );
+		return c( 'database.prefix' );
 	}
 
-	public function replaceGetId( $data ) {
-		$pri = $this->connection->getPrimaryKey();
-		//主键为空或0时删除主键
-		if ( isset( $data[ $pri ] ) && empty( $data[ $pri ] ) ) {
-			unset( $data[ $pri ] );
-		}
-
-		return $this->insertGetId( $data, 'replace' );
-	}
-
+	/**
+	 * 插入并获取自增主键
+	 *
+	 * @param $data
+	 * @param string $action
+	 *
+	 * @return bool|mixed
+	 */
 	public function insertGetId( $data, $action = 'insert' ) {
 		if ( $result = $this->insert( $data, $action ) ) {
 			return $this->connection->getInsertId();
@@ -55,6 +56,14 @@ class Query {
 		}
 	}
 
+	/**
+	 * 字段值增加
+	 * @param $field
+	 * @param int $dec
+	 *
+	 * @return mixed
+	 * @throws \Exception
+	 */
 	public function increment( $field, $dec = 1 ) {
 		$where = $this->build()->parseWhere();
 		if ( empty( $where ) ) {
@@ -65,6 +74,14 @@ class Query {
 		return $this->connection->execute( $sql, $this->build()->getUpdateParams() );
 	}
 
+	/**
+	 * 字段值减少
+	 * @param $field
+	 * @param int $dec
+	 *
+	 * @return mixed
+	 * @throws \Exception
+	 */
 	public function decrement( $field, $dec = 1 ) {
 		$where = $this->build()->parseWhere();
 		if ( empty( $where ) ) {
@@ -76,6 +93,13 @@ class Query {
 		return $this->connection->execute( $sql, $this->build()->getUpdateParams() );
 	}
 
+	/**
+	 * 更新数据
+	 *
+	 * @param $data
+	 *
+	 * @return bool
+	 */
 	public function update( $data ) {
 		//移除表中不存在字段
 		$data = $this->connection->filterTableField( $data );
@@ -118,7 +142,14 @@ class Query {
 		return FALSE;
 	}
 
-	//记录不存在时创建
+	/**
+	 * 记录不存在时创建
+	 *
+	 * @param $param
+	 * @param $data
+	 *
+	 * @return bool
+	 */
 	function firstOrCreate( $param, $data ) {
 		if ( ! $this->where( key( $param ), current( $param ) )->first() ) {
 			return $this->insert( $data );
@@ -127,6 +158,15 @@ class Query {
 		}
 	}
 
+	/**
+	 * 插入数据
+	 *
+	 * @param $data
+	 * @param string $action
+	 *
+	 * @return bool
+	 * @throws \Exception
+	 */
 	public function insert( $data, $action = 'insert' ) {
 		//移除非法字段
 		$data = $this->connection->filterTableField( $data );
@@ -166,7 +206,13 @@ class Query {
 		}
 	}
 
-	//查找一条数据
+	/**
+	 * 查找一条数据
+	 *
+	 * @param null $id
+	 *
+	 * @return array
+	 */
 	public function first( $id = NULL ) {
 		if ( $id ) {
 			$this->where( $this->connection->getPrimaryKey(), $id );
@@ -176,6 +222,13 @@ class Query {
 		return $data ? $data[0] : [ ];
 	}
 
+	/**
+	 * 查询集合
+	 *
+	 * @param array $field
+	 *
+	 * @return bool
+	 */
 	public function get( array $field = [ ] ) {
 		if ( ! empty( $field ) ) {
 			$this->field( $field );
@@ -184,6 +237,13 @@ class Query {
 		return $this->connection->query( $this->build()->select(), $this->build()->getSelectParams() );
 	}
 
+	/**
+	 * 查询一个字段
+	 *
+	 * @param $field
+	 *
+	 * @return mixed
+	 */
 	public function pluck( $field ) {
 		$result = $this->first();
 		if ( ! empty( $result ) ) {
@@ -191,6 +251,13 @@ class Query {
 		}
 	}
 
+	/**
+	 * 获取字段列表
+	 *
+	 * @param $field
+	 *
+	 * @return array
+	 */
 	public function lists( $field ) {
 		$result = $this->field( $field )->get();
 		$data   = [ ];
@@ -220,6 +287,13 @@ class Query {
 		return [ ];
 	}
 
+	/**
+	 * 设置结果集字段
+	 *
+	 * @param $field
+	 *
+	 * @return \hdphp\db\Connection
+	 */
 	public function field( $field ) {
 		$field = is_array( $field ) ? $field : explode( ',', $field );
 		foreach ( (array) $field as $k => $v ) {
@@ -229,6 +303,10 @@ class Query {
 		return $this->connection;
 	}
 
+	/**
+	 * 分组查询
+	 * @return \hdphp\db\Connection
+	 */
 	public function groupBy() {
 		$this->build()->bindExpression( 'groupBy', func_get_arg( 0 ) );
 
@@ -417,6 +495,10 @@ class Query {
 		return $this->connection;
 	}
 
+	/**
+	 * 多表内连接
+	 * @return \hdphp\db\connection\DbInterface
+	 */
 	public function join() {
 		$args = func_get_args();
 		$this->build()->bindExpression( 'join', " INNER JOIN " . $this->getPrefix() . "{$args[0]} {$args[0]} ON {$args[1]} {$args[2]} {$args[3]}" );
@@ -424,6 +506,10 @@ class Query {
 		return $this->connection;
 	}
 
+	/**
+	 * 多表左外连接
+	 * @return \hdphp\db\connection\DbInterface
+	 */
 	public function leftJoin() {
 		$args = func_get_args();
 		$this->build()->bindExpression( 'join', " LEFT JOIN " . $this->getPrefix() . "{$args[0]} {$args[0]} ON {$args[1]} {$args[2]} {$args[3]}" );
@@ -431,6 +517,10 @@ class Query {
 		return $this->connection;
 	}
 
+	/**
+	 * 多表右外连接
+	 * @return \hdphp\db\connection\DbInterface
+	 */
 	public function rightJoin() {
 		$args = func_get_args();
 		$this->build()->bindExpression( 'join', " RIGHT JOIN " . $this->getPrefix() . "{$args[0]} {$args[0]} ON {$args[1]} {$args[2]} {$args[3]}" );
@@ -438,6 +528,13 @@ class Query {
 		return $this->connection;
 	}
 
+	/**
+	 * 魔术方法
+	 * @param $method
+	 * @param $params
+	 *
+	 * @return mixed
+	 */
 	public function __call( $method, $params ) {
 		if ( substr( $method, 0, 5 ) == 'getBy' ) {
 			$field = preg_replace( '/.[A-Z]/', '_\1', substr( $method, 5 ) );
@@ -456,17 +553,6 @@ class Query {
 	 */
 	public function getQueryParams( $type ) {
 		return $this->build()->getBindExpression( $type );
-	}
-
-	public function sql( $sql ) {
-		$result = preg_split( '/;(\r|\n)/is', $sql );
-		foreach ( (array) $result as $r ) {
-			if ( ! $this->connection->execute( $r ) ) {
-				return FALSE;
-			}
-		}
-
-		return TRUE;
 	}
 
 }

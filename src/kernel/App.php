@@ -29,6 +29,17 @@ class App extends Container {
 	protected $serviceProviders = [ ];
 
 	public function bootstrap() {
+		define( 'IS_CLI', PHP_SAPI == 'cli' );
+		define( 'NOW', $_SERVER['REQUEST_TIME'] );
+		IS_CLI or define( 'IS_GET', $_SERVER['REQUEST_METHOD'] == 'GET' );
+		IS_CLI or define( 'IS_POST', $_SERVER['REQUEST_METHOD'] == 'POST' );
+		IS_CLI or define( 'IS_DELETE', $_SERVER['REQUEST_METHOD'] == 'DELETE' ? TRUE : ( isset( $_POST['_method'] ) && $_POST['_method'] == 'DELETE' ) );
+		IS_CLI or define( 'IS_PUT', $_SERVER['REQUEST_METHOD'] == 'PUT' ? TRUE : ( isset( $_POST['_method'] ) && $_POST['_method'] == 'PUT' ) );
+		IS_CLI or define( 'IS_AJAX', isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && strtolower( $_SERVER['HTTP_X_REQUESTED_WITH'] ) == 'xmlhttprequest' );
+		IS_CLI or define( 'IS_WEIXIN', isset( $_SERVER['HTTP_USER_AGENT'] ) && strpos( $_SERVER['HTTP_USER_AGENT'], 'MicroMessenger' ) !== FALSE );
+		define( '__ROOT__', IS_CLI ? '' : trim( 'http://' . $_SERVER['HTTP_HOST'] . dirname( $_SERVER['SCRIPT_NAME'] ), '/\\' ) );
+		IS_CLI or define( '__URL__', trim( 'http://' . $_SERVER['HTTP_HOST'] . '/' . trim( $_SERVER['REQUEST_URI'], '/\\' ), '/' ) );
+		IS_CLI or define( "__HISTORY__", isset( $_SERVER["HTTP_REFERER"] ) ? $_SERVER["HTTP_REFERER"] : '' );
 		//加载服务配置项
 		$servers              = require __DIR__ . '/service.php';
 		$config               = require ROOT_PATH . '/system/config/service.php';
@@ -70,7 +81,7 @@ class App extends Container {
 	//执行请求
 	public function cli() {
 		//命令模式
-		if ( PHP_SAPI == 'cli' && $_SERVER['SCRIPT_NAME'] == 'hd' ) {
+		if ( IS_CLI && $_SERVER['SCRIPT_NAME'] == 'hd' ) {
 			require_once __DIR__ . '/../cli/Cli.php';
 			\hdphp\cli\Cli::run();
 			exit;
