@@ -11,15 +11,33 @@
 
 use Exception;
 use hdphp\db\connection\DbInterface;
+use hdphp\model\Model;
+use hdphp\traits\HdArrayAccess;
 
-class Query {
+class Query implements \ArrayAccess, \Iterator {
+	use HdArrayAccess;
+	//数据
+	protected $data = [ ];
+	//模型类
+	protected $model;
+	//表名
+	protected $table;
+	//字段列表
+	protected $fields;
+	//表主键
+	protected $primaryKey;
 	//数据库连接
 	protected $connection;
 	//sql分析实例
 	protected $build;
 
-	public function __construct( DbInterface $connection ) {
-		$this->connection = $connection;
+	public function __construct() {
+		$this->connection();
+	}
+
+	public function connection() {
+		$class            = '\hdphp\db\connection\\' . ucfirst( c( 'database.driver' ) );
+		$this->connection = new $class;
 	}
 
 	/**
@@ -29,7 +47,7 @@ class Query {
 	public function build() {
 		if ( ! $this->build ) {
 			$driver      = 'hdphp\db\build\\' . ucfirst( c( 'database.driver' ) );
-			$this->build = new $driver( $this->connection );
+			$this->build = new $driver( $this->getTable() );
 		}
 
 		return $this->build;
@@ -38,6 +56,106 @@ class Query {
 	//获取表前缀
 	protected function getPrefix() {
 		return c( 'database.prefix' );
+	}
+
+	/**
+	 * 设置表
+	 *
+	 * @param $table
+	 *
+	 * @return $this
+	 */
+	public function table( $table ) {
+		//模型实例时不允许改表名
+		$this->table = $this->table ?: c( 'database.prefix' ) . $table;
+		//缓存表字段
+		$this->fields = \Schema::getFields( $table );
+		//获取表主键
+		$this->primaryKey = \Schema::getPrimaryKey( $table );
+
+		return $this;
+	}
+
+	/**
+	 * 获取表
+	 * @return mixed
+	 */
+	public function getTable() {
+		return $this->table;
+	}
+
+	/**
+	 * 获取表字段
+	 * @return array|bool
+	 */
+	public function getFields() {
+		return $this->fields;
+	}
+
+	/**
+	 * 获取表主键
+	 * @return mixed
+	 */
+	public function getPrimaryKey() {
+		return $this->primaryKey;
+	}
+
+	/**
+	 * 移除表中不存在的字段
+	 *
+	 * @param $data
+	 *
+	 * @return array
+	 */
+	public function filterTableField( array $data ) {
+		$new = [ ];
+		if ( is_array( $data ) ) {
+			foreach ( $data as $name => $value ) {
+				if ( key_exists( $name, $this->fields ) ) {
+					$new[ $name ] = $value;
+				}
+			}
+		}
+
+		return $new;
+	}
+
+	/**
+	 * 设置模型
+	 *
+	 * @param \hdphp\model\Model $model
+	 *
+	 * @return \hdphp\db\Query
+	 */
+	public function model( Model $model ) {
+		$this->model = $model;
+
+		return $this->table( $this->model->getTableName() );
+	}
+
+	/**
+	 * 获取模型
+	 * @return mixed
+	 */
+	public function getModel() {
+		return $this->model;
+	}
+
+	/**
+	 * 结果压入data属性
+	 *
+	 * @param $data
+	 *
+	 * @return $this
+	 */
+	public function data( $data ) {
+		$this->data = $data;
+
+		return $this;
+	}
+
+	public function toArray() {
+		return $this->data;
 	}
 
 	/**
@@ -57,7 +175,65 @@ class Query {
 	}
 
 	/**
+	 * 分页查询
+	 *
+	 * @param $row 每页显示数量
+	 * @param int $pageNum
+	 *
+	 * @return \hdphp\db\Collection
+	 */
+	public function paginate( $row, $pageNum = 8 ) {
+		$obj = clone $this;
+		\Page::row( $row )->pageNum( $pageNum )->make( $obj->count() );
+
+		return $this->limit( \Page::limit() )->get();
+	}
+
+	public function __clone() {
+		$this->build = clone $this->build;
+	}
+
+	/**
+	 * 前台显示页码样式
+	 * @return mixed
+	 */
+	public function links() {
+		return \Page::show();
+	}
+
+	/**
+	 * 无结果集的操作
+	 *
+	 * @param $sql
+	 * @param $params
+	 *
+	 * @return mixed
+	 */
+	public function execute( $sql, array $params = [ ] ) {
+		$result = $this->connection->execute( $sql, $params );
+		$this->build()->reset();
+
+		return $result;
+	}
+
+	/**
+	 * 有结果集的操作
+	 *
+	 * @param $sql
+	 * @param $params
+	 *
+	 * @return mixed
+	 */
+	public function query( $sql, array $params = [ ] ) {
+		$data = $this->connection->query( $sql, $params );
+		$this->build()->reset();
+
+		return $data;
+	}
+
+	/**
 	 * 字段值增加
+	 *
 	 * @param $field
 	 * @param int $dec
 	 *
@@ -69,13 +245,14 @@ class Query {
 		if ( empty( $where ) ) {
 			throw new Exception( '缺少更新条件' );
 		}
-		$sql = "UPDATE " . $this->connection->getTable() . " SET {$field}={$field}+$dec " . $where;
+		$sql = "UPDATE " . $this->getTable() . " SET {$field}={$field}+$dec " . $where;
 
-		return $this->connection->execute( $sql, $this->build()->getUpdateParams() );
+		return $this->execute( $sql, $this->build()->getUpdateParams() );
 	}
 
 	/**
 	 * 字段值减少
+	 *
 	 * @param $field
 	 * @param int $dec
 	 *
@@ -88,9 +265,9 @@ class Query {
 			throw new Exception( '缺少更新条件' );
 		}
 
-		$sql = "UPDATE " . $this->connection->getTable() . " SET {$field}={$field}-$dec " . $where;
+		$sql = "UPDATE " . $this->getTable() . " SET {$field}={$field}-$dec " . $where;
 
-		return $this->connection->execute( $sql, $this->build()->getUpdateParams() );
+		return $this->execute( $sql, $this->build()->getUpdateParams() );
 	}
 
 	/**
@@ -102,21 +279,21 @@ class Query {
 	 */
 	public function update( $data ) {
 		//移除表中不存在字段
-		$data = $this->connection->filterTableField( $data );
+		$data = $this->filterTableField( $data );
 		foreach ( $data as $k => $v ) {
 			$this->build()->bindExpression( 'set', $k );
 			$this->build()->bindParams( 'values', $v );
 		}
 		if ( ! $this->build()->getBindExpression( 'where' ) ) {
 			//有主键时使用主键做条件
-			$pri = $this->connection->getPrimaryKey();
+			$pri = $this->getPrimaryKey();
 			if ( isset( $data[ $pri ] ) ) {
-				$this->where( $pri, '=', $data[ $pri ] );
+				$this->where( $pri, $data[ $pri ] );
 			}
 		}
 		//必须有条件才可以更新
 		if ( $this->build()->getBindExpression( 'where' ) ) {
-			return $this->connection->execute( $this->build()->update(), $this->build()->getUpdateParams() );
+			return $this->execute( $this->build()->update(), $this->build()->getUpdateParams() );
 		}
 
 		return FALSE;
@@ -132,11 +309,11 @@ class Query {
 	 */
 	public function delete( $id = [ ] ) {
 		if ( ! empty( $id ) ) {
-			$this->whereIn( $this->connection->getPrimaryKey(), is_array( $id ) ? $id : explode( ',', $id ) );
+			$this->whereIn( $this->getPrimaryKey(), is_array( $id ) ? $id : explode( ',', $id ) );
 		}
 		//必须有条件才可以删除
 		if ( $this->build()->getBindExpression( 'where' ) ) {
-			return $this->connection->execute( $this->build()->delete(), $this->build()->getDeleteParams() );
+			return $this->execute( $this->build()->delete(), $this->build()->getDeleteParams() );
 		}
 
 		return FALSE;
@@ -151,7 +328,7 @@ class Query {
 	 * @return bool
 	 */
 	function firstOrCreate( $param, $data ) {
-		if ( ! $this->where( key( $param ), current( $param ) )->first() ) {
+		if ( ! $this->where( key( $param ), current( $param ) )->find() ) {
 			return $this->insert( $data );
 		} else {
 			return FALSE;
@@ -169,7 +346,7 @@ class Query {
 	 */
 	public function insert( $data, $action = 'insert' ) {
 		//移除非法字段
-		$data = $this->connection->filterTableField( $data );
+		$data = $this->filterTableField( $data );
 		if ( empty( $data ) ) {
 			throw new Exception( '没有数据用于插入,请检查字段名' );
 		}
@@ -180,61 +357,62 @@ class Query {
 			$this->build()->bindParams( 'values', $v );
 		}
 
-		return $this->connection->execute( $this->build()->$action(), $this->build()->getInsertParams() );
+		return $this->execute( $this->build()->$action(), $this->build()->getInsertParams() );
 	}
 
+	/**
+	 * 替换数据适用于表中有唯一索引的字段
+	 *
+	 * @param $data
+	 *
+	 * @return bool
+	 */
 	public function replace( $data ) {
 		return $this->insert( $data, 'replace' );
 	}
 
 	/**
-	 * 根据主键查找一条记录
+	 * 根据主键查找一条数据
 	 *
-	 * @param $id
+	 * @param int $id
 	 *
-	 * @return array|null
+	 * @return array|\hdphp\db\Query
 	 */
 	public function find( $id ) {
-		$pri = $this->connection->getPrimaryKey();
-		if ( $pri && $id ) {
-			$data = $this->where( $pri, '=', $id )->first();
-			if ( $this->connection->model ) {
-				return $this->connection->model->data( $data );
-			}
+		if ( $id ) {
+			$this->where( $this->getPrimaryKey(), $id );
+			if ( $data = $this->query( $this->build()->select(), $this->build()->getSelectParams() ) ) {
+				$res = $data ? $data[0] : [ ];
+				if ( $model = $this->getModel() ) {
+					$instance = clone $model;
 
-			return $data;
+					return $instance->data( $res );
+				} else {
+					$instance = clone $this;
+
+					return $instance->data( $res );
+				}
+			}
 		}
 	}
 
 	/**
 	 * 查找一条数据
-	 *
-	 * @param null $id
-	 *
-	 * @return array
+	 * @return \hdphp\db\Query
 	 */
-	public function first( $id = NULL ) {
-		if ( $id ) {
-			$this->where( $this->connection->getPrimaryKey(), $id );
+	public function first() {
+		if ( $data = $this->query( $this->build()->select(), $this->build()->getSelectParams() ) ) {
+			$res = $data ? $data[0] : [ ];
+			if ( $model = $this->getModel() ) {
+				$instance = clone $model;
+
+				return $instance->data( $res );
+			} else {
+				$instance = clone $this;
+
+				return $instance->data( $res );
+			}
 		}
-		$data = $this->get();
-
-		return $data ? $data[0] : [ ];
-	}
-
-	/**
-	 * 查询集合
-	 *
-	 * @param array $field
-	 *
-	 * @return bool
-	 */
-	public function get( array $field = [ ] ) {
-		if ( ! empty( $field ) ) {
-			$this->field( $field );
-		}
-
-		return $this->connection->query( $this->build()->select(), $this->build()->getSelectParams() );
 	}
 
 	/**
@@ -245,9 +423,39 @@ class Query {
 	 * @return mixed
 	 */
 	public function pluck( $field ) {
-		$result = $this->first();
+		$data   = $this->query( $this->build()->select(), $this->build()->getSelectParams() );
+		$result = $data ? $data[0] : [ ];
 		if ( ! empty( $result ) ) {
 			return $result[ $field ];
+		}
+	}
+
+	/**
+	 * 查询集合
+	 *
+	 * @param array $field
+	 *
+	 * @return array
+	 */
+	public function get( array $field = [ ] ) {
+		if ( ! empty( $field ) ) {
+			$this->field( $field );
+		}
+		if ( $results = $this->query( $this->build()->select(), $this->build()->getSelectParams() ) ) {
+			$Collection = Collection::make( [ ] );
+			if ( $model = $this->getModel() ) {
+				foreach ( $results as $k => $v ) {
+					$instance         = clone $model;
+					$Collection[ $k ] = $instance->data( $v );
+				}
+			} else {
+				foreach ( $results as $k => $v ) {
+					$instance         = clone $this;
+					$Collection[ $k ] = $instance->data( $v );
+				}
+			}
+
+			return $Collection;
 		}
 	}
 
@@ -256,12 +464,12 @@ class Query {
 	 *
 	 * @param $field
 	 *
-	 * @return array
+	 * @return array|mixed
 	 */
 	public function lists( $field ) {
-		$result = $this->field( $field )->get();
+		$result = $this->query( $this->build()->select(), $this->build()->getSelectParams() );
 		$data   = [ ];
-		if ( ! empty( $result ) ) {
+		if ( $result ) {
 			$field = explode( ',', $field );
 			switch ( count( $field ) ) {
 				case 1:
@@ -280,11 +488,7 @@ class Query {
 					}
 					break;
 			}
-
-			return $data;
 		}
-
-		return [ ];
 	}
 
 	/**
@@ -292,7 +496,7 @@ class Query {
 	 *
 	 * @param $field
 	 *
-	 * @return \hdphp\db\Connection
+	 * @return \hdphp\db\connection\DbInterface
 	 */
 	public function field( $field ) {
 		$field = is_array( $field ) ? $field : explode( ',', $field );
@@ -300,17 +504,17 @@ class Query {
 			$this->build()->bindExpression( 'field', $v );
 		}
 
-		return $this->connection;
+		return $this;
 	}
 
 	/**
 	 * 分组查询
-	 * @return \hdphp\db\Connection
+	 * @return \hdphp\db\connection\DbInterface
 	 */
 	public function groupBy() {
 		$this->build()->bindExpression( 'groupBy', func_get_arg( 0 ) );
 
-		return $this->connection;
+		return $this;
 	}
 
 	public function having() {
@@ -318,21 +522,21 @@ class Query {
 		$this->build()->bindExpression( 'having', $args[0] . $args[1] . ' ? ' );
 		$this->build()->bindParams( 'having', $args[2] );
 
-		return $this->connection;
+		return $this;
 	}
 
 	public function orderBy() {
 		$args = func_get_args();
 		$this->build()->bindExpression( 'orderBy', $args[0] . " " . ( empty( $args[1] ) ? ' ASC ' : " $args[1]" ) );
 
-		return $this->connection;
+		return $this;
 	}
 
 	public function limit() {
 		$args = func_get_args();
 		$this->build()->bindExpression( 'limit', $args[0] . " " . ( empty( $args[1] ) ? '' : ",{$args[1]}" ) );
 
-		return $this->connection;
+		return $this;
 	}
 
 	public function count( $field = '*' ) {
@@ -379,7 +583,7 @@ class Query {
 
 		$this->build()->bindExpression( 'where', trim( $login ) );
 
-		return $this->connection;
+		return $this;
 	}
 
 	public function where() {
@@ -399,7 +603,7 @@ class Query {
 				break;
 		}
 
-		return $this->connection;
+		return $this;
 	}
 
 	//预准备whereRaw
@@ -410,35 +614,35 @@ class Query {
 			$this->build()->bindParams( 'where', $p );
 		}
 
-		return $this->connection;
+		return $this;
 	}
 
 	public function orWhere() {
 		$this->logic( 'OR' );
 		call_user_func_array( [ $this, 'where' ], func_get_args() );
 
-		return $this->connection;
+		return $this;
 	}
 
 	public function andWhere() {
 		$this->build()->bindExpression( 'where', ' AND ' );
 		call_user_func_array( [ $this, 'where' ], func_get_args() );
 
-		return $this->connection;
+		return $this;
 	}
 
 	public function whereNull( $field ) {
 		$this->logic( 'AND' );
 		$this->build()->bindExpression( 'where', "$field IS NULL" );
 
-		return $this->connection;
+		return $this;
 	}
 
 	public function whereNotNull( $field ) {
 		$this->logic( 'AND' );
 		$this->build()->bindExpression( 'where', "$field IS NOT NULL" );
 
-		return $this->connection;
+		return $this;
 	}
 
 	public function whereIn( $field, $params ) {
@@ -453,7 +657,7 @@ class Query {
 		}
 		$this->build()->bindExpression( 'where', " $field IN (" . substr( $where, 0, - 1 ) . ")" );
 
-		return $this->connection;
+		return $this;
 	}
 
 	public function whereNotIn( $field, $params ) {
@@ -468,7 +672,7 @@ class Query {
 		}
 		$this->build()->bindExpression( 'where', " $field NOT IN (" . substr( $where, 0, - 1 ) . ")" );
 
-		return $this->connection;
+		return $this;
 	}
 
 	public function whereBetween( $field, $params ) {
@@ -480,7 +684,7 @@ class Query {
 		$this->build()->bindParams( 'where', $params[0] );
 		$this->build()->bindParams( 'where', $params[1] );
 
-		return $this->connection;
+		return $this;
 	}
 
 	public function whereNotBetween( $field, $params ) {
@@ -492,7 +696,7 @@ class Query {
 		$this->build()->bindParams( 'where', $params[0] );
 		$this->build()->bindParams( 'where', $params[1] );
 
-		return $this->connection;
+		return $this;
 	}
 
 	/**
@@ -503,7 +707,7 @@ class Query {
 		$args = func_get_args();
 		$this->build()->bindExpression( 'join', " INNER JOIN " . $this->getPrefix() . "{$args[0]} {$args[0]} ON {$args[1]} {$args[2]} {$args[3]}" );
 
-		return $this->connection;
+		return $this;
 	}
 
 	/**
@@ -514,7 +718,7 @@ class Query {
 		$args = func_get_args();
 		$this->build()->bindExpression( 'join', " LEFT JOIN " . $this->getPrefix() . "{$args[0]} {$args[0]} ON {$args[1]} {$args[2]} {$args[3]}" );
 
-		return $this->connection;
+		return $this;
 	}
 
 	/**
@@ -525,11 +729,12 @@ class Query {
 		$args = func_get_args();
 		$this->build()->bindExpression( 'join', " RIGHT JOIN " . $this->getPrefix() . "{$args[0]} {$args[0]} ON {$args[1]} {$args[2]} {$args[3]}" );
 
-		return $this->connection;
+		return $this;
 	}
 
 	/**
 	 * 魔术方法
+	 *
 	 * @param $method
 	 * @param $params
 	 *
@@ -540,8 +745,10 @@ class Query {
 			$field = preg_replace( '/.[A-Z]/', '_\1', substr( $method, 5 ) );
 			$field = strtolower( $field );
 
-			return $this->where( $field, '=', current( $params ) )->first();
+			return $this->where( $field, current( $params ) )->find();
 		}
+
+		return call_user_func_array( [ $this->connection, $method ], $params );
 	}
 
 	/**

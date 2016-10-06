@@ -13,9 +13,10 @@ use hdphp\kernel\ServiceProvider;
 
 class MiddlewareProvider extends ServiceProvider {
 	//延迟加载
-	public $defer = FALSE;
+	public    $defer = FALSE;
+	protected $instance;
 
-	public function boot() {
+	public function boot( $app ) {
 	}
 
 	public function register() {

@@ -9,10 +9,13 @@
  * '-------------------------------------------------------------------*/
 namespace hdphp\db\build;
 
-use hdphp\db\Build;
-
+/**
+ * 查询语句组件
+ * Class Mysql
+ * @package hdphp\db\build
+ * @author 向军
+ */
 class Mysql extends Build {
-
 	public function select() {
 		return str_replace( [
 			'%field%',

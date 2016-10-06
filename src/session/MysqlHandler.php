@@ -32,15 +32,8 @@ class MysqlHandler implements AbSession {
 		$this->expire = $expire ? $expire : 864000;
 
 		//连接Mysql
-		$this->link = mysql_connect( $database['host'], $database['user'], $database['password'] );
-		//选择数据库
-		$db = mysql_select_db( $database['database'], $this->link );
-		if ( ! $this->link || ! $db ) {
-			return FALSE;
-		}
-
-		mysql_query( "SET NAMES UTF8" );
-
+		//		$this->link = mysql_connect( $database['host'], $database['user'], $database['password'] );
+		$this->link = Db::table( Config::get( 'session.mysql.table' ) );
 		session_set_save_handler( [ &$this, "open" ], [ &$this, "close" ], [ &$this, "read" ], [ &$this, "write" ], [ &$this, "destroy" ], [
 			&$this,
 			"gc"
@@ -63,15 +56,9 @@ class MysqlHandler implements AbSession {
 	 * @return string
 	 */
 	public function read( $id ) {
-		$sql    = "SELECT data FROM " . $this->table . " WHERE sessid='$id' AND atime>" . ( time() - $this->expire );
-		$result = mysql_query( $sql, $this->link );
-		if ( $result ) {
-			$data = mysql_fetch_assoc( $result );
+		$data = $this->link->where( 'sessid', $id )->where( 'atime', '>', time() - $this->expire )->pluck( 'data' );
 
-			return $data['data'];
-		}
-
-		return '';
+		return $data ?: '';
 	}
 
 	/**
@@ -86,7 +73,7 @@ class MysqlHandler implements AbSession {
 		$sql = "REPLACE INTO " . $this->table . "(sessid,data,atime) ";
 		$sql .= "VALUES('$id','$data'," . time() . ')';
 
-		return mysql_query( $sql, $this->link );
+		return $this->link->execute( $sql );
 	}
 
 	/**
@@ -99,7 +86,7 @@ class MysqlHandler implements AbSession {
 	public function destroy( $id ) {
 		$sql = "DELETE FROM " . $this->table . " WHERE sessid='$id'";
 
-		return mysql_query( $sql, $this->link );
+		return $this->link->execute( $sql );
 	}
 
 	/**
@@ -110,7 +97,7 @@ class MysqlHandler implements AbSession {
 
 		$sql = "DELETE FROM " . $this->table . " WHERE atime<" . ( time() - $this->expire ) . " AND sessid<>'" . session_id() . "'";
 
-		return mysql_query( $sql, $this->link );
+		return $this->link->execute( $sql );
 	}
 
 
@@ -120,8 +107,6 @@ class MysqlHandler implements AbSession {
 			$this->gc();
 		}
 
-		//关闭数据库连接
-		return mysql_close( $this->link );
 	}
 
 	public function __destruct() {

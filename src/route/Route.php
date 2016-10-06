@@ -9,7 +9,11 @@
  * '-------------------------------------------------------------------*/
 namespace hdphp\route;
 
-//路由处理类
+/**
+ * 路由处理类
+ * Class Route
+ * @package hdphp\route
+ */
 class Route extends Compile {
 	public static $app;
 	//路由定义
@@ -75,7 +79,10 @@ class Route extends Compile {
 
 	}
 
-	// 解析标签
+	/**
+	 * 解析标签
+	 * @return bool|void
+	 */
 	public function dispatch() {
 		//加载路由定义
 		require ROOT_PATH . '/system/routes.php';
@@ -99,7 +106,9 @@ class Route extends Compile {
 		Controller::run();
 	}
 
-	// 解析路由
+	/**
+	 * 解析路由
+	 */
 	protected function parseRoute() {
 		/**
 		 * 为每一条路由规则生成正则表达式缓存
@@ -140,9 +149,9 @@ class Route extends Compile {
 	/**
 	 * 获取路由参数
 	 *
-	 * @param  string $name 变量名
+	 * @param $name
 	 *
-	 * @return mixed
+	 * @return mixed|null
 	 */
 	public function input( $name ) {
 		return isset( $this->args[ $name ] ) ? $this->args[ $name ] : NULL;

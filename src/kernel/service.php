@@ -44,6 +44,7 @@ return [
 		'hdphp\tool\ToolProvider',
 		'hdphp\cloud\CloudProvider',
 		'hdphp\database\SchemaProvider',
+		'hdphp\collection\CollectionProvider',
 	],
 
 	//服务外观
@@ -90,5 +91,6 @@ return [
 		'Tool'       => 'hdphp\tool\ToolFacade',
 		'Cloud'      => 'hdphp\cloud\CloudFacade',
 		'Schema'     => 'hdphp\database\SchemaFacade',
+		'Collection' => 'hdphp\collection\CollectionFacade',
 	],
 ];

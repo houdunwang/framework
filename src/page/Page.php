@@ -10,6 +10,7 @@
 namespace hdphp\page;
 
 class Page {
+
 	//总条数
 	protected $totalRow;
 
@@ -30,6 +31,9 @@ class Page {
 
 	//文字描述
 	protected $desc = [ 'pre' => '上一页', 'next' => '下一页', 'first' => '首页', 'end' => '尾页', 'unit' => '条' ];
+
+	//前页页码显示样式
+	protected $show;
 
 	/**
 	 * 显示条数
@@ -73,6 +77,13 @@ class Page {
 		$this->selfPage();
 		//基本uri
 		$this->setUrl();
+	}
+
+	/**
+	 * 前台显示页面列表
+	 * @return string
+	 */
+	public function show() {
 		if ( $this->totalPage > 1 ) {
 			return '<nav><ul class="pagination">' . $this->pre() . $this->strList() . $this->next() . '</ul></nav>';
 		} else {

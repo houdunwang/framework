@@ -44,6 +44,7 @@ class Controller {
 		define( 'ACTION', $param[2] );
 		define( 'MODULE_PATH', ROOT_PATH . '/app/' . MODULE );
 		define( 'VIEW_PATH', MODULE_PATH . '/' . 'view' );
+		define( '__VIEW__', __ROOT__ . '/app/' . MODULE . '/view' );
 		self::action();
 	}
 
@@ -60,18 +61,18 @@ class Controller {
 		}
 		$controller = Route::$app->make( $class, TRUE );
 		$action     = method_exists( $controller, ACTION ) ? ACTION : '__empty';
-		//执行中间件
-		\Middleware::run();
+		//执行控制器中间件
+		\Middleware::performControllerMiddleware();
 		//执行动作
 		try {
 			$reflection = new ReflectionMethod( $controller, $action );
 			if ( $reflection->isPublic() ) {
 				//执行动作
 				if ( $result = call_user_func_array( [ $controller, $action ], self::$routeArgs ) ) {
-					if ( IS_AJAX ) {
+					if ( IS_AJAX && is_array( $result ) ) {
 						\Response::ajax( $result );
 					} else {
-						echo ( $result );
+						echo( $result );
 					}
 				}
 			} else {

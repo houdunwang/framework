@@ -96,6 +96,17 @@ class Code {
 		return $this;
 	}
 
+	/**
+	 * 验证验证码
+	 *
+	 * @param string $field 表单字段
+	 *
+	 * @return bool
+	 */
+	public function auth( $field = 'code' ) {
+		return ! isset( $_POST[ $field ] ) || strtoupper( $_POST[ $field ] ) == Code::get();
+	}
+
 	//返回验证码
 	public function get() {
 		return $_SESSION['code'];

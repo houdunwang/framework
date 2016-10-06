@@ -25,16 +25,28 @@ class VaAction {
 		return empty( $value ) ? FALSE : TRUE;
 	}
 
+	//验证码验证
+	public function captcha( $field, $value, $params, $data ) {
+		$post = Request::post();
+
+		return ! isset( $post[ $field ] ) || strtoupper( $post[ $field ] ) == \Code::get();
+	}
+
 	//存在字段时验证失败
 	public function exists( $field, $value, $params, $data ) {
 		return isset( $data[ $field ] ) ? FALSE : TRUE;
 	}
 
 	//自动验证字段值唯一
-	private function unique( $field, $value, $param ) {
-		if ( ! Db::table( $param )->where( $field, $value )->first() ) {
-			return TRUE;
+	public function unique( $field, $value, $params, $data ) {
+		//		p( func_get_args() );exit;
+		$args = explode( ',', $params );
+		$db   = Db::table( $args[0] )->where( $field, $value );
+		if ( isset( $data[ $args[1] ] ) ) {
+			$db->where( $args[1], '<>', $data[ $args[1] ] );
 		}
+
+		return empty( $value ) || ! $db->pluck( $field ) ? TRUE : FALSE;
 	}
 
 	//邮箱验证
@@ -48,7 +60,8 @@ class VaAction {
 	//验证用户名长度
 	public function user( $field, $value, $params, $data ) {
 		$params = explode( ',', $params );
-		return preg_match('/^[\x{4e00}-\x{9fa5}a-z0-9]{'.($params[0]-1).','.($params[1]-1).'}$/ui',$value) ? true : false;
+
+		return preg_match( '/^[\x{4e00}-\x{9fa5}a-z0-9]{' . ( $params[0] - 1 ) . ',' . ( $params[1] - 1 ) . '}$/ui', $value ) ? TRUE : FALSE;
 	}
 
 	//邮编验证

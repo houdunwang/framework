@@ -12,45 +12,52 @@ namespace hdphp\model;
 trait Relation {
 
 	/**
-	 * 一对一关联
+	 * 一对一
 	 *
-	 * @param  [type]  $class      [description]
-	 * @param  [type]  $relationId [description]
-	 * @param  [type]  $primaryKey [description]
+	 * @param $class 关联模型
+	 * @param $foreignKey 关联表关联字段
+	 * @param $localKey 本模型字段
 	 *
-	 * @return boolean             [description]
+	 * @return mixed
 	 */
-	protected function hasOne( $class, $relationId, $primaryKey ) {
-		$instance = ( new $class )->where( $relationId, $this->original->$primaryKey )->first();
+	protected function hasOne( $class, $foreignKey = NULL, $localKey = NULL ) {
+		$foreignKey = $foreignKey ?: $this->table . '_' . $this->pk;
+		$localKey   = $localKey ?: $this->pk;
 
-		return $instance;
+		return ( new $class() )->where( $foreignKey, $this[ $localKey ] )->first();
 	}
 
 	/**
-	 * 多表关联hasMany
+	 * 一对多
 	 *
-	 * @param  [string]  $class      [description]
-	 * @param  [string]  $relationId [description]
+	 * @param $class 关联模型
+	 * @param $foreignKey 关联表关联字段
+	 * @param $localKey 本模型字段
 	 *
-	 * @return [object]              [description]
+	 * @return mixed
 	 */
-	protected function hasMany( $class, $rid, $pid = 'id' ) {
-		if ( $items = ( new $class )->where( $rid, $this->$pid )->get() ) {
-			return $items;
-		}
+	protected function hasMany( $class, $foreignKey = NULL, $localKey = NULL ) {
+		$foreignKey = $foreignKey ?: $this->table . '_' . $this->pk;
+		$localKey   = $localKey ?: $this->pk;
+		return ( new $class() )->where( $foreignKey, $this[ $localKey ] )->get();
 	}
 
 	/**
-	 * 副表关联主表
+	 * 相对的关联
 	 *
-	 * @param  [string] $class      [description]
-	 * @param  [string] $relationId [description]
-	 * @param  [string] $primaryKey [description]
+	 * @param $class
+	 * @param $parentKey
+	 * @param $localKey
 	 *
-	 * @return [type]             [description]
+	 * @return mixed
 	 */
-	protected function belongsTo( $class, $rid, $pid ) {
-		return ( new $class )->where( $pid, $this->$rid )->first();
+	protected function belongsTo( $class, $localKey = NULL, $parentKey = NULL ) {
+		$instance = new $class();
+		//父表
+		$parentKey = $parentKey ?: $instance->getPrimaryKey();
+		$localKey  = $localKey ?: $instance->getTableName() . '_' . $instance->getPrimaryKey();
+
+		return ( new $class )->where( $parentKey, $this[ $localKey ] )->first();
 	}
 
 	/**
@@ -58,41 +65,19 @@ trait Relation {
 	 *
 	 * @param  [string] $class       [关联类]
 	 * @param  [string] $middleTabe [中间表]
-	 * @param  [string] $relationId  [主表字段]
-	 * @param  [string] $primaryKey  [关联表字段]
+	 * @param  [string] $localKey  [主表字段]
+	 * @param  [string] $foreignKey  [关联表字段]
 	 *
 	 * @return [object]
 	 */
-	protected function belongsToMany( $class, $middleTable, $middlePrimaryKey, $middleRelationId ) {
-		$pKey   = $this->primaryKey;
-		$middle = Db::table( $middleTable )->where( $middlePrimaryKey, $this->$pKey )->lists( $middleRelationId );
+	protected function belongsToMany( $class, $middleTable, $localKey = NULL, $foreignKey = NULL ) {
+		$instance   = ( new $class );
+		$localKey   = $localKey ?: $this->table . '_' . $this->pk;
+		$foreignKey = $foreignKey ?: $instance->getTableName() . '_' . $instance->getPrimaryKey();
+		$middle     = Db::table( $middleTable )->where( $localKey, $this[ $this->pk ] )->lists( $foreignKey );
 
-		$instance = ( new $class );
 
-		return $instance->whereIn( $instance->primaryKey, array_values( $middle ) )->get();
-	}
-
-	/**
-	 * 根据关联条件查询
-	 *
-	 * @param  [type]  $relation [description]
-	 *
-	 * @return boolean           [description]
-	 */
-	public function has( $relation ) {
-		// $this->
-	}
-
-	/**
-	 * 预载入
-	 *
-	 * @param  [type] $param [description]
-	 *
-	 * @return [type]        [description]
-	 */
-	public function with( $param ) {
-		$this->with[ $param ];
-		// return $
+		return $instance->whereIn( $instance->getPrimaryKey(), array_values( $middle ) )->get();
 	}
 }
 

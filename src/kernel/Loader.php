@@ -46,17 +46,7 @@ class Loader {
 			require_once str_replace( '\\', DS, self::$alias[ $class ] );
 		} else if ( is_file( ROOT_PATH . DS . $file ) ) {
 			require_once ROOT_PATH . DS . $file;
-		}
-		//		else if ( is_file( HDPHP_PATH . DS . $file ) ) {
-		//			require_once HDPHP_PATH . DS . $file;
-		//		} else if ( defined( 'APP_PATH' ) && is_file( APP_PATH . DS . $file ) ) {
-		//			//项目文件
-		//			require_once APP_PATH . DS . $file;
-		//		} else if ( defined( 'MODULE_PATH' ) && is_file( MODULE_PATH . DS . $file ) ) {
-		//			//项目文件
-		//			require_once MODULE_PATH . DS . $file;
-		//		}
-		else if ( class_exists( 'Config', FALSE ) ) {
+		} else if ( class_exists( 'Config', FALSE ) ) {
 			//自动加载命名空间
 			foreach ( (array) \Config::get( 'app.autoload_namespace' ) as $key => $value ) {
 				if ( strpos( $class, $key ) !== FALSE ) {

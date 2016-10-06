@@ -10,7 +10,6 @@
 
 namespace hdphp\db\connection;
 
-use hdphp\db\Query;
 use PDO;
 use Closure;
 use Exception;
@@ -18,8 +17,6 @@ use Exception;
 trait Connection {
 	//数据库连接配置
 	protected $config;
-	//查询实例
-	protected $query;
 	//本次查询影响的条数
 	protected $affectedRow;
 	//查询语句日志
@@ -27,7 +24,6 @@ trait Connection {
 
 	//初始化
 	public function __construct() {
-		$this->query = new Query( $this );
 		$this->link();
 	}
 
@@ -65,7 +61,6 @@ trait Connection {
 	 * @throws \Exception
 	 */
 	public function execute( $sql, array $params = [ ] ) {
-		$this->query->build()->reset();
 		//准备sql
 		$sth = $this->link( TRUE )->prepare( $sql );
 		//绑定参数
@@ -119,7 +114,6 @@ trait Connection {
 	 * @throws \Exception
 	 */
 	public function query( $sql, array $params = [ ] ) {
-		$this->query->build()->reset();
 		//准备sql
 		$sth = $this->link( FALSE )->prepare( $sql );
 		//设置保存数据
@@ -218,9 +212,5 @@ trait Connection {
 	 */
 	public function getQueryLog() {
 		return self::$queryLogs;
-	}
-
-	public function __call( $method, $arguments ) {
-		return call_user_func_array( [ $this->query, $method ], $arguments );
 	}
 }

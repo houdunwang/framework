@@ -124,12 +124,12 @@ php;
 	//标签处理
 	public function _foreach( $attr, $content ) {
 		if ( isset( $attr['key'] ) ) {
-			$php = "<?php foreach ((array){$attr['from']} as {$attr['key']}=>{$attr['value']}){?>";
+			$php = "<?php if(!empty({$attr['from']})){ foreach ({$attr['from']} as {$attr['key']}=>{$attr['value']}){?>";
 		} else {
-			$php = "<?php foreach ((array){$attr['from']} as {$attr['value']}){?>";
+			$php = "<?php if(!empty({$attr['from']})){foreach ({$attr['from']} as {$attr['value']}){?>";
 		}
 		$php .= $content;
-		$php .= '<?php }?>';
+		$php .= '<?php }}?>';
 
 		return $php;
 	}
@@ -165,7 +165,7 @@ php;
 		if ( c( 'view.blade' ) ) {
 			$obj = new View;
 
-			return $obj->fetch( $this->replaceConst( $attr['file'] ) );
+			return $obj->make( $this->replaceConst( $attr['file'] ) );
 		}
 	}
 

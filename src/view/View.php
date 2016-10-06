@@ -22,6 +22,10 @@ class View {
 	//缓存目录
 	protected $cacheDir;
 
+	public function __construct() {
+
+	}
+
 	/**
 	 * 解析模板
 	 *
@@ -63,13 +67,17 @@ class View {
 	 * @throws Exception
 	 */
 	public function getTemplateFile( $file ) {
-		$file = $file ? str_replace( '.', '/', $file ) : $file;
+		//没有扩展名时添加上
+		if ( $file && !preg_match( '/\.[a-z]+$/i', $file ) ) {
+			$file .= c( 'view.prefix' );
+		}
+
 		if ( is_file( $file ) ) {
 			return $file;
 		}
 		if ( defined( 'MODULE' ) ) {
 			//模块视图文件夹
-			$f = strtolower( MODULE_PATH . '/view/' . CONTROLLER ) . '/' . ( $file ?: ACTION ) . c( 'view.prefix' );
+			$f = strtolower( MODULE_PATH . '/view/' . CONTROLLER ) . '/' . ( $file ?: ACTION . c( 'view.prefix' ) );
 			if ( is_file( $f ) ) {
 				return $f;
 			}
@@ -132,7 +140,6 @@ class View {
 		} else {
 			self::$vars[ $name ] = $value;
 		}
-
 		return $this;
 	}
 

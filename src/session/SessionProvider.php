@@ -25,7 +25,6 @@ class SessionProvider extends ServiceProvider {
 		$expire = Config::get( 'session.expire' );
 
 		if ( $expire > 0 ) {
-
 			setcookie( session_name(), session_id(), time() + $expire, '/' );
 		}
 	}

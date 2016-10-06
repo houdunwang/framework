@@ -7,11 +7,11 @@
  * |    WeChat: aihoudun
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
-namespace hdphp\validate;
+namespace hdphp\collection;
 
 use hdphp\kernel\ServiceProvider;
 
-class ValidateProvider extends ServiceProvider {
+class CollectionProvider extends ServiceProvider {
 
 	//延迟加载
 	public $defer = TRUE;
@@ -20,8 +20,8 @@ class ValidateProvider extends ServiceProvider {
 	}
 
 	public function register() {
-		$this->app->single( 'Validate', function () {
-			return new Validate();
+		$this->app->bind( 'Collection', function ( $app ) {
+			return new Collection( $app );
 		} );
 	}
 }

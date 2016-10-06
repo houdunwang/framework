@@ -23,9 +23,7 @@ class Db {
 
 	//获取数据驱动
 	public function connect() {
-		$class = '\hdphp\db\connection\\' . ucfirst( c( 'database.driver' ) );
-
-		return new $class();
+		return new Query();
 	}
 
 	/**

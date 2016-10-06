@@ -8,12 +8,14 @@
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
 namespace hdphp\request;
-
 //请求处理
 class Request {
-
 	public function __call( $method, $params ) {
-		$params[0] = $method . '.' . $params[0];
+		if ( empty( $params ) ) {
+			$params[0] = $method . '.';
+		} else {
+			$params[0] = $method . '.' . $params[0];
+		}
 
 		return call_user_func_array( [ $this, 'query' ], $params );
 	}
@@ -66,7 +68,7 @@ class Request {
 		//q("post.")返回所有
 		if ( empty( $var[1] ) ) {
 			return $data;
-		} else if ( isset( $data[ $var[1] ] ) ) {
+		} else if ( ! empty( $data[ $var[1] ] ) ) {
 			$value = $data[ $var[1] ];
 			//参数过滤函数
 			if ( ! empty( $filter ) ) {
@@ -88,11 +90,6 @@ class Request {
 		} else {
 			return $data[ $var[1] ] = $default;
 		}
-	}
-
-	//检测请求类型
-	public function isMethod( $method ) {
-
 	}
 
 	//客户端IP
