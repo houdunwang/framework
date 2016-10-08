@@ -85,10 +85,6 @@ class Model implements ArrayAccess, Iterator {
 	protected $filter = [ ];
 	//时间操作
 	protected $timestamps = FALSE;
-	//允许插入的字段
-	protected $denyInsertFields = [ ];
-	//允许更新的字段
-	protected $denyUpdateFields = [ ];
 	//数据库驱动
 	protected $db;
 
@@ -235,6 +231,10 @@ class Model implements ArrayAccess, Iterator {
 					if ( $VaAction->$method( $field, $value, $params, $data ) !== TRUE ) {
 						$this->error[] = $error;
 					}
+				} else if ( function_exists( $method ) ) {
+					if ( $method( $value ) != TRUE ) {
+						$this->error[] = $error;
+					}
 				} else if ( substr( $method, 0, 1 ) == '/' ) {
 					//正则表达式
 					if ( ! preg_match( $method, $value ) ) {
@@ -268,8 +268,9 @@ class Model implements ArrayAccess, Iterator {
 			$auto[3] = isset( $auto[3] ) ? $auto[3] : self::EXIST_AUTO;
 			//验证时间
 			$auto[4] = isset( $auto[4] ) ? $auto[4] : self::MODEL_BOTH;
-			//有这个字段处理
+
 			if ( $auto[3] == self::EXIST_AUTO && ! isset( $data[ $auto[0] ] ) ) {
+				//有这个字段处理
 				continue;
 			} else if ( $auto[3] == self::NOT_EMPTY_AUTO && empty( $data[ $auto[0] ] ) ) {
 				//不为空时处理
@@ -278,7 +279,7 @@ class Model implements ArrayAccess, Iterator {
 				//值为空时处理
 				continue;
 			} else if ( $auto[3] == self::NOT_EXIST_AUTO && isset( $data[ $auto[0] ] ) ) {
-				//值为空时处理
+				//值不存在时处理
 				continue;
 			} else if ( $auto[3] == self::MUST_AUTO ) {
 				//必须处理
@@ -398,8 +399,10 @@ class Model implements ArrayAccess, Iterator {
 
 		$data = $data ?: $this->data;
 		//主键为空时删除
-		if ( isset( $data[ $this->pk ] ) && empty( $this->pk ) ) {
-			unset( $data[ $this->pk ] );
+		if ( isset( $data[ $this->pk ] ) ) {
+			if ( empty( $data[ $this->pk ] ) || ! Db::table( $this->table )->find( intval( $data[ $this->pk ] ) ) ) {
+				unset( $data[ $this->pk ] );
+			}
 		}
 		//动作类型  1 插入 2 更新
 		$type = empty( $data[ $this->pk ] ) ? self::MODEL_INSERT : self::MODEL_UPDATE;
@@ -412,6 +415,8 @@ class Model implements ArrayAccess, Iterator {
 				$data['created_at'] = NOW;
 			}
 		}
+		//字段映射
+		$data = $this->parseFieldsMap( $data, $type );
 		//自动完成
 		$data = $this->autoOperation( $data, $type );
 		//自动过滤
@@ -420,8 +425,6 @@ class Model implements ArrayAccess, Iterator {
 		if ( ! $this->autoValidate( $data, $type ) ) {
 			return FALSE;
 		}
-		//字段映射
-		$data = $this->parseFieldsMap( $data, $type );
 
 		return $data ?: [ ];
 	}
@@ -436,13 +439,10 @@ class Model implements ArrayAccess, Iterator {
 	 */
 	final public function save( array $data = [ ] ) {
 		if ( ! $data = $this->create( $data ) ) {
-			return FALSE;
-		}
-		if ( empty( $data ) ) {
 			throw new \Exception( '没有操作的数据' );
 		}
 		//更新条件检测
-		$action = empty( $data[ $this->pk ] ) ? 'insert' : 'update';
+		$action = empty( $data[ $this->pk ] ) ? 'insertGetId' : 'update';
 
 		return $this->db->$action( $data );
 	}

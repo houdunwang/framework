@@ -10,7 +10,6 @@
  * '-------------------------------------------------------------------*/
 
 use Exception;
-use hdphp\db\connection\DbInterface;
 use hdphp\model\Model;
 use hdphp\traits\HdArrayAccess;
 
@@ -183,10 +182,15 @@ class Query implements \ArrayAccess, \Iterator {
 	 * @return \hdphp\db\Collection
 	 */
 	public function paginate( $row, $pageNum = 8 ) {
-		$obj = clone $this;
+		$obj = unserialize( serialize( $this ) );
 		\Page::row( $row )->pageNum( $pageNum )->make( $obj->count() );
 
-		return $this->limit( \Page::limit() )->get();
+		$res     = $this->limit( \Page::limit() )->get();
+		$collect = Collection::make( [ ] );
+		if ( $res ) {
+			$collect->make( $res );
+		}
+		return $collect;
 	}
 
 	public function __clone() {
@@ -368,15 +372,15 @@ class Query implements \ArrayAccess, \Iterator {
 	 * @return bool
 	 */
 	public function replace( $data ) {
-		return $this->insert( $data, 'replace' );
+		return $this->insertGetId( $data, 'replace' );
 	}
 
 	/**
 	 * 根据主键查找一条数据
 	 *
-	 * @param int $id
+	 * @param $id
 	 *
-	 * @return array|\hdphp\db\Query
+	 * @return mixed
 	 */
 	public function find( $id ) {
 		if ( $id ) {
@@ -388,9 +392,7 @@ class Query implements \ArrayAccess, \Iterator {
 
 					return $instance->data( $res );
 				} else {
-					$instance = clone $this;
-
-					return $instance->data( $res );
+					return $res;
 				}
 			}
 		}
@@ -408,9 +410,7 @@ class Query implements \ArrayAccess, \Iterator {
 
 				return $instance->data( $res );
 			} else {
-				$instance = clone $this;
-
-				return $instance->data( $res );
+				return $res;
 			}
 		}
 	}
@@ -442,20 +442,17 @@ class Query implements \ArrayAccess, \Iterator {
 			$this->field( $field );
 		}
 		if ( $results = $this->query( $this->build()->select(), $this->build()->getSelectParams() ) ) {
-			$Collection = Collection::make( [ ] );
 			if ( $model = $this->getModel() ) {
+				$Collection = Collection::make( [ ] );
 				foreach ( $results as $k => $v ) {
 					$instance         = clone $model;
 					$Collection[ $k ] = $instance->data( $v );
 				}
-			} else {
-				foreach ( $results as $k => $v ) {
-					$instance         = clone $this;
-					$Collection[ $k ] = $instance->data( $v );
-				}
-			}
 
-			return $Collection;
+				return $Collection;
+			} else {
+				return $results;
+			}
 		}
 	}
 
@@ -468,8 +465,8 @@ class Query implements \ArrayAccess, \Iterator {
 	 */
 	public function lists( $field ) {
 		$result = $this->query( $this->build()->select(), $this->build()->getSelectParams() );
-		$data   = [ ];
 		if ( $result ) {
+			$data  = [ ];
 			$field = explode( ',', $field );
 			switch ( count( $field ) ) {
 				case 1:
@@ -488,6 +485,8 @@ class Query implements \ArrayAccess, \Iterator {
 					}
 					break;
 			}
+
+			return $data;
 		}
 	}
 

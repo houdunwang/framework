@@ -51,4 +51,25 @@ class Tool {
 			readfile( $filepath );
 		}
 	}
+
+	/**
+	 * 根据大小返回标准单位 KB  MB GB等
+	 *
+	 * @param int $size
+	 * @param int $decimals 小数位
+	 *
+	 * @return string
+	 */
+	public function getSize( $size, $decimals = 2 ) {
+		switch ( TRUE ) {
+			case $size >= pow( 1024, 3 ):
+				return round( $size / pow( 1024, 3 ), $decimals ) . " GB";
+			case $size >= pow( 1024, 2 ):
+				return round( $size / pow( 1024, 2 ), $decimals ) . " MB";
+			case $size >= pow( 1024, 1 ):
+				return round( $size / pow( 1024, 1 ), $decimals ) . " KB";
+			default:
+				return $size . 'B';
+		}
+	}
 }

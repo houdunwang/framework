@@ -62,7 +62,7 @@ class Compile {
 		if ( C( 'app.token_on' ) ) {
 			//表单添加令牌
 			if ( preg_match_all( '/<form.*?>(.*?)<\/form>/is', $this->content, $matches, PREG_SET_ORDER ) ) {
-				$token = md5( c( 'app.key' ) . clientIp() );
+				$token = md5( c( 'app.key' ) . Request::ip() );
 				foreach ( $matches as $id => $m ) {
 					$php           = "<input type='hidden' name='" . C( 'app.token_name' ) . "' value='" . $token . "'/>";
 					$this->content = str_replace( $m[1], $m[1] . $php, $this->content );

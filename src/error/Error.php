@@ -14,7 +14,7 @@ class Error {
 	private $app;
 
 	public function __construct( $app ) {
-		error_reporting( 0 );
+//		error_reporting(E_ALL);
 		$this->app = $app;
 
 	}

@@ -36,7 +36,11 @@ if ( ! function_exists( 'collect' ) ) {
 		return \Collection::make( $data );
 	}
 }
-
+if ( ! function_exists( 'nopic' ) ) {
+	function nopic( $file ) {
+		return is_file( $file ) ? $file : 'resource/images/nopic.jpg';
+	}
+}
 /**
  * 生成url
  *
@@ -112,7 +116,7 @@ if ( ! function_exists( 'q' ) ) {
  */
 if ( ! function_exists( '_404' ) ) {
 	function _404() {
-		\Response::sendHttpStatus( 404 );
+		\Response::sendHttpStatus( 302 );
 		if ( is_file( c( 'view.404' ) ) ) {
 			require( c( 'view.404' ) );
 		}
@@ -151,14 +155,6 @@ if ( ! function_exists( 'dd' ) ) {
 	}
 }
 
-/**
- * 获取客户端ip
- */
-if ( ! function_exists( 'clientIp' ) ) {
-	function clientIp() {
-		return \Request::ip();
-	}
-}
 /**
  * 跳转网址
  *
@@ -217,7 +213,7 @@ if ( ! function_exists( 'f' ) ) {
 			}
 		}
 
-		$data = "<?php if(!defined('HDPHP_PATH'))exit;\nreturn " . var_export( $value, TRUE ) . ";\n?>";
+		$data = "<?php if(!defined('ROOT_PATH'))exit;\nreturn " . var_export( $value, TRUE ) . ";\n?>";
 
 		if ( ! is_dir( $path ) ) {
 			mkdir( $path, 0755, TRUE );
@@ -246,7 +242,7 @@ if ( ! function_exists( 'd' ) ) {
 		switch ( $value ) {
 			case '[get]':
 				//获取
-				$cache = $db->where( '`key`', '=', $key )->pluck( 'value' );
+				$cache = $db->where( '`key`', $key )->pluck( 'value' );
 				if ( $cache ) {
 					return unserialize( $cache );
 				}
@@ -264,28 +260,7 @@ if ( ! function_exists( 'd' ) ) {
 		}
 	}
 }
-/**
- * 根据大小返回标准单位 KB  MB GB等
- *
- * @param $size 数字
- * @param int $decimals 小数位
- *
- * @return string
- */
-if ( ! function_exists( 'get_size' ) ) {
-	function get_size( $size, $decimals = 2 ) {
-		switch ( TRUE ) {
-			case $size >= pow( 1024, 3 ):
-				return round( $size / pow( 1024, 3 ), $decimals ) . " GB";
-			case $size >= pow( 1024, 2 ):
-				return round( $size / pow( 1024, 2 ), $decimals ) . " MB";
-			case $size >= pow( 1024, 1 ):
-				return round( $size / pow( 1024, 1 ), $decimals ) . " KB";
-			default:
-				return $size . 'B';
-		}
-	}
-}
+
 /**
  * 导入类库
  *
@@ -396,7 +371,7 @@ if ( ! function_exists( 'confirm' ) ) {
 	 */
 	function confirm( $message, $sUrl, $eUrl ) {
 		View::with( [ 'message' => $message, 'sUrl' => $sUrl, 'eUrl' => $eUrl ] );
-		View::make( Config::get( 'view.confirm' ) );
+		echo view( Config::get( 'view.confirm' ) );
 		exit;
 	}
 }
@@ -413,6 +388,14 @@ if ( ! function_exists( 'ajax' ) ) {
 	}
 }
 
+/**
+ * 获取客户端ip
+ */
+if ( ! function_exists( 'clientIp' ) ) {
+	function clientIp() {
+		return \Request::ip();
+	}
+}
 
 if ( ! function_exists( 'message' ) ) {
 	/**
@@ -424,7 +407,7 @@ if ( ! function_exists( 'message' ) ) {
 	 */
 	function message( $content, $redirect = 'back', $type = 'success', $timeout = 2 ) {
 		if ( IS_AJAX ) {
-			Response::ajax( [ 'valid' => $type == 'success' ? 1 : 0, 'message' => $content ] );
+			ajax( [ 'valid' => $type == 'success' ? 1 : 0, 'message' => $content ] );
 		} else {
 			switch ( $redirect ) {
 				case 'back':

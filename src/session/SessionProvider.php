@@ -18,7 +18,6 @@ class SessionProvider extends ServiceProvider {
 
 	public function boot() {
 		\Session::make();
-
 		//开启session
 		session_start();
 		//cookie的PHPSESSID过期时间

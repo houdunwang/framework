@@ -3,6 +3,7 @@
 return [
 	//服务提供者
 	'providers' => [
+		'hdphp\error\ErrorProvider',
 		'hdphp\alipay\AlipayProvider',
 		'hdphp\arr\ArrProvider',
 		'hdphp\backup\BackupProvider',
@@ -17,7 +18,6 @@ return [
 		'hdphp\db\DbProvider',
 		'hdphp\dir\DirProvider',
 		'hdphp\log\LogProvider',
-		'hdphp\error\ErrorProvider',
 		'hdphp\html\HtmlProvider',
 		'hdphp\image\ImageProvider',
 		'hdphp\lang\LangProvider',

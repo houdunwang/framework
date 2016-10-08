@@ -29,7 +29,7 @@ class VaAction {
 	public function captcha( $field, $value, $params, $data ) {
 		$post = Request::post();
 
-		return ! isset( $post[ $field ] ) || strtoupper( $post[ $field ] ) == \Code::get();
+		return isset( $post[ $field ] ) && strtoupper( $post[ $field ] ) == \Code::get();
 	}
 
 	//存在字段时验证失败
@@ -39,7 +39,6 @@ class VaAction {
 
 	//自动验证字段值唯一
 	public function unique( $field, $value, $params, $data ) {
-		//		p( func_get_args() );exit;
 		$args = explode( ',', $params );
 		$db   = Db::table( $args[0] )->where( $field, $value );
 		if ( isset( $data[ $args[1] ] ) ) {
@@ -132,7 +131,7 @@ class VaAction {
 	//数字范围
 	public function num( $name, $value, $params ) {
 		$params = explode( ',', $params );
-		if ( $value >= $params[0] && $value <= $params[1] ) {
+		if ( intval($value) >= $params[0] && intval($value) <= $params[1] ) {
 			return TRUE;
 		}
 	}

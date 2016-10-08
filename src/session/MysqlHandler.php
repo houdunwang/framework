@@ -23,7 +23,6 @@ class MysqlHandler implements AbSession {
 
 	//初始
 	public function make() {
-		$database = Config::get( 'database' );
 		$options  = Config::get( 'session.mysql' );
 		//数据表
 		$this->table = Config::get( 'database.prefix' ) . $options['table'];

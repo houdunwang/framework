@@ -60,17 +60,16 @@ class Controller {
 			throw new Exception( "{$class} 不存在" );
 		}
 		$controller = Route::$app->make( $class, TRUE );
-		$action     = method_exists( $controller, ACTION ) ? ACTION : '__empty';
 		//执行控制器中间件
 		\Middleware::performControllerMiddleware();
 		//执行动作
 		try {
-			$reflection = new ReflectionMethod( $controller, $action );
+			$reflection = new ReflectionMethod( $controller, ACTION );
 			if ( $reflection->isPublic() ) {
 				//执行动作
-				if ( $result = call_user_func_array( [ $controller, $action ], self::$routeArgs ) ) {
+				if ( $result = call_user_func_array( [ $controller, ACTION ], self::$routeArgs ) ) {
 					if ( IS_AJAX && is_array( $result ) ) {
-						\Response::ajax( $result );
+						ajax( $result );
 					} else {
 						echo( $result );
 					}

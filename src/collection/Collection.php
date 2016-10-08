@@ -75,7 +75,7 @@ class Collection implements \Iterator, \ArrayAccess {
 	 * @since 5.0.0
 	 */
 	public function offsetExists( $offset ) {
-		return isset( $this->items[ $key ] );
+		return isset( $this->items[ $offset ] );
 	}
 
 	/**
@@ -131,7 +131,7 @@ class Collection implements \Iterator, \ArrayAccess {
 	public function toArray() {
 		$res = [ ];
 		foreach ( $this->items as $k => $v ) {
-			$res[] = $v->toArray();
+			$res[] = is_array( $v ) ? $v : $v->toArray();
 		}
 
 		return $res;
@@ -139,6 +139,7 @@ class Collection implements \Iterator, \ArrayAccess {
 
 	/**
 	 * 设置items值
+	 *
 	 * @param $data
 	 *
 	 * @return $this

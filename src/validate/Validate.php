@@ -115,7 +115,7 @@ class Validate extends VaAction {
 					go( __HISTORY__ );
 					break;
 				case 'show':
-					message( implode( '<br/>', $errors ), 'back', 'error' );
+					message( implode( '<br/>', $errors ), 'back', 'error' ,3);
 					break;
 				case 'default':
 					break;

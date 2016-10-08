@@ -59,6 +59,14 @@ class View {
 	}
 
 	/**
+	 * 返回模板解析后的字符
+	 * @return mixed
+	 */
+	public function fetch( $tpl = '' ) {
+		return $this->make( $tpl )->__toString();
+	}
+
+	/**
 	 * 获取模板文件
 	 *
 	 * @param string $file 模板文件
@@ -68,7 +76,7 @@ class View {
 	 */
 	public function getTemplateFile( $file ) {
 		//没有扩展名时添加上
-		if ( $file && !preg_match( '/\.[a-z]+$/i', $file ) ) {
+		if ( $file && ! preg_match( '/\.[a-z]+$/i', $file ) ) {
 			$file .= c( 'view.prefix' );
 		}
 
@@ -140,6 +148,7 @@ class View {
 		} else {
 			self::$vars[ $name ] = $value;
 		}
+
 		return $this;
 	}
 
