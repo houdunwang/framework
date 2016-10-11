@@ -17,6 +17,7 @@ class ConfigProvider extends ServiceProvider {
 	public $defer = FALSE;
 
 	public function boot() {
+		date_default_timezone_set( c( 'app.timezone' ) );
 	}
 
 	public function register() {

@@ -228,6 +228,17 @@ if ( ! function_exists( 'f' ) ) {
 		return TRUE;
 	}
 }
+
+if ( ! function_exists( 'cli' ) ) {
+	function cli() {
+		$argv[] = 'hd';
+		foreach ( func_get_args() as $v ) {
+			$argv[] = $v;
+		}
+		$_SERVER['argv'] = $argv;
+		\hdphp\cli\Cli::run();
+	}
+}
 /**
  * 快速数据库缓存
  *

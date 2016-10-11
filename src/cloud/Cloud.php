@@ -39,10 +39,10 @@ class Cloud {
 	 *
 	 * @return mixed
 	 */
-	public function connect($data) {
-		$res              = Curl::post( $this->url . "?a=cloud/connect&t=web&siteid=1&m=store", $data );
+	public function connect( $data ) {
+		$res = Curl::post( $this->url . "?a=cloud/connect&t=web&siteid=1&m=store", $data );
 
-		return json_decode( $res ,true);
+		return json_decode( $res, TRUE );
 	}
 
 	/**

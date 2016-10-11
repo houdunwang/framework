@@ -25,12 +25,20 @@ class Cli {
 
 	//输出错误信息
 	public static function error( $content ) {
-		die( "\033[;36m $content \x1B[0m\n" );
+		if ( IS_CLI ) {
+			die( "\033[;36m $content \x1B[0m\n" );
+		} else {
+			message( $content, 'back', 'error' );
+		}
 	}
 
 	//成功信息
 	public static function success( $content ) {
-		die( "\033[;32m $content \x1B[0m\n" );
+		if ( IS_CLI ) {
+			die( "\033[;32m $content \x1B[0m\n" );
+		} else {
+			message( $content, 'back', 'error' );
+		}
 	}
 }
 

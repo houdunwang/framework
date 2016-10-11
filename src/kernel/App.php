@@ -62,12 +62,10 @@ class App extends Container {
 		Loader::autoloadFile();
 		//启动服务
 		$this->boot();
-		//应用开始中间件
-		\Middleware::exe( 'app_start' );
-		//时区设置
-		date_default_timezone_set( c( 'app.timezone' ) );
 		//CLI模式
 		$this->cli();
+		//应用开始中间件
+		\Middleware::exe( 'app_start' );
 		//解析路由
 		Route::dispatch();
 		//记录日志

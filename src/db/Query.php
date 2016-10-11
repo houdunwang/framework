@@ -188,8 +188,10 @@ class Query implements \ArrayAccess, \Iterator {
 		$res     = $this->limit( \Page::limit() )->get();
 		$collect = Collection::make( [ ] );
 		if ( $res ) {
-			$collect->make( $res );
+			//模型数据要转换为数组形式
+			$collect->make( $this->getModel() ? $res->toArray() : $res );
 		}
+
 		return $collect;
 	}
 

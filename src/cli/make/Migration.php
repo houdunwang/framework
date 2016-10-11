@@ -10,7 +10,7 @@ class Migration {
 	public function __construct() { }
 
 	public function run( $name, $arg ) {
-		$info      = explode( '=', $arg );
+		$info = explode( '=', $arg );
 		//检测文件是否存在,也检测类名
 		foreach ( glob( ROOT_PATH . '/system/database/migrations/*.php' ) as $f ) {
 			if ( substr( basename( $f ), 18, - 4 ) == $name ) {

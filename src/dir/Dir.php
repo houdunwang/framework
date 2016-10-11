@@ -67,7 +67,9 @@ class Dir {
 
 	//创建目录
 	public function create( $dir, $auth = 0755 ) {
-		return mkdir( $dir, $auth, TRUE );
+		if ( ! empty( $dir ) ) {
+			return is_dir( $dir ) or mkdir( $dir, $auth, TRUE );
+		}
 	}
 
 	//复制目录
