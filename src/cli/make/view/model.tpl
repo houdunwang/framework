@@ -16,6 +16,12 @@ class {{MODEL}} extends Model{
 	//数据表
 	protected $table = "{{TABLE}}";
 
+	//允许填充字段
+	protected $allowFill = [ ];
+
+	//禁止填充字段
+	protected $denyFill = [ ];
+
 	//完整表名
 	protected $full = false;
 
@@ -36,11 +42,4 @@ class {{MODEL}} extends Model{
 
 	//时间操作,需要表中存在created_at,updated_at字段
 	protected $timestamps=false;
-
-
-	//禁止插入的字段
-	protected $denyInsertFields = [];
-
-	//禁止更新的字段
-	protected $denyUpdateFields = [];
 }
