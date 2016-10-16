@@ -473,7 +473,7 @@ class Model implements ArrayAccess, Iterator {
 	 * 更新模型的时间戳
 	 * @return bool
 	 */
-	final protected function touch() {
+	final public function touch() {
 		$this->updated_at = time();
 
 		return $this->save();
