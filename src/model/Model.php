@@ -245,7 +245,7 @@ class Model implements ArrayAccess, Iterator {
 		}
 		\Validate::respond( $this->error );
 
-		return TRUE;
+		return $this->error ? FALSE : TRUE;
 	}
 
 	/**
