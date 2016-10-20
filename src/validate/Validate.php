@@ -97,7 +97,7 @@ class Validate extends VaAction {
 		}
 
 		//验证返回信息处理
-		$this->respond($this->error);
+		$this->respond( $this->error );
 
 		return $this;
 	}
@@ -105,7 +105,7 @@ class Validate extends VaAction {
 	/**
 	 * 验证返回信息处理
 	 */
-	public function respond($errors) {
+	public function respond( $errors ) {
 		//验证返回信息处理
 		if ( count( $errors ) > 0 ) {
 			switch ( c( 'error.app.validate' ) ) {
@@ -115,7 +115,7 @@ class Validate extends VaAction {
 					go( __HISTORY__ );
 					break;
 				case 'show':
-					message( implode( '<br/>', $errors ), 'back', 'error' ,3);
+					message( implode( '<br/>', $errors ), 'back', 'error', 3 );
 					break;
 				case 'default':
 					break;
@@ -147,7 +147,7 @@ class Validate extends VaAction {
 	 * 获取错误信息
 	 * @return array
 	 */
-	public function all() {
+	public function getError() {
 		return $this->error;
 	}
 
