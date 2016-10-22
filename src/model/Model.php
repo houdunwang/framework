@@ -13,7 +13,7 @@ use hdphp\traits\HdArrayAccess;
 use Iterator;
 
 class Model implements ArrayAccess, Iterator {
-	use HdArrayAccess, Relation;
+	use \hdphp\model\ArrayAccess, Relation;
 
 	//----------自动验证----------
 	//有字段时验证
@@ -90,7 +90,7 @@ class Model implements ArrayAccess, Iterator {
 	//数据库驱动
 	protected $db;
 
-	public function __construct() {
+	public function __construct( $arg = null ) {
 		$this->class = get_class( $this );
 		$this->model = basename( str_replace( '/', '\\', $this->class ) );
 		$this->setTable();
@@ -98,6 +98,11 @@ class Model implements ArrayAccess, Iterator {
 		$this->db = \Db::connect()->model( $this );
 		if ( empty( $this->pk ) ) {
 			$this->pk = $this->db->getPrimaryKey();
+		}
+		if ( is_numeric( $arg ) ) {
+			$this->data = Db::table( $this->table )->find( $arg ) ?: [ ];
+		} else if ( is_array( $arg ) ) {
+			$this->create( $arg );
 		}
 	}
 
@@ -168,8 +173,8 @@ class Model implements ArrayAccess, Iterator {
 	final private function unique( $field, $value, $param, $data ) {
 		//表主键
 		$db = \Db::table( $this->table );
-		if ( isset( $data[ $this->pk ] ) ) {
-			$db->where( $this->pk, '<>', $data[ $this->pk ] );
+		if ( isset( $this->data[ $this->pk ] ) ) {
+			$db->where( $this->pk, '<>', $this->data[ $this->pk ] );
 		}
 		if ( empty( $value ) || ! $db->where( $field, $value )->pluck( $field ) ) {
 			return true;
@@ -356,19 +361,19 @@ class Model implements ArrayAccess, Iterator {
 					$data = Arr::filter_by_keys( $data, $this->denyFill, 1 );
 				}
 			}
-			//移除主键字段
-			if ( isset( $data[ $this->pk ] ) ) {
-				unset( $data[ $this->pk ] );
-			}
-			//修改时间
-			if ( $this->timestamps === true ) {
-				$this->original['updated_at'] = NOW;
-				if ( $this->actionType() == self::MODEL_INSERT ) {
-					//更新时间
-					$this->original['created_at'] = NOW;
-				}
-			}
 			$this->original = $data;
+		}
+		//更新时设置主键
+		if ( $this->actionType() == self::MODEL_UPDATE ) {
+			$this->original[ $this->pk ] = $this->data[ $this->pk ];
+		}
+		//修改时间
+		if ( $this->timestamps === true ) {
+			$this->original['updated_at'] = NOW;
+			if ( $this->actionType() == self::MODEL_INSERT ) {
+				//更新时间
+				$this->original['created_at'] = NOW;
+			}
 		}
 	}
 
@@ -394,22 +399,23 @@ class Model implements ArrayAccess, Iterator {
 		//自动完成/自动过滤/自动验证
 		$this->autoOperation();
 		$this->autoFilter();
-		if ( $this->autoValidate() ) {
+		if ( ! $this->autoValidate() ) {
 			return false;
 		}
 		//更新条件检测
 		$res = false;
+		$db  = Db::table( $this->table );
 		switch ( $this->actionType() ) {
 			case self::MODEL_UPDATE:
-				if ( $res = $this->db->update( $this->original ) ) {
-					$this->data = Db::table( $this->table )->find( $this->data[ $this->pk ] );
-
-					return true;
+				if ( $res = $db->update( $this->original ) ) {
+					$this->data = $db->find( $this->data[ $this->pk ] );
 				}
 				break;
 			case self::MODEL_INSERT:
-				if ( $res = $this->db->insertGetId( $this->original ) ) {
-					$this->data = Db::table( $this->table )->find( $res );
+				if ( $res = $db->insertGetId( $this->original ) ) {
+					if ( is_numeric( $res ) ) {
+						$this->data = $db->find( $res );
+					}
 				}
 				break;
 		}

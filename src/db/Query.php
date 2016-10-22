@@ -337,7 +337,7 @@ class Query implements \ArrayAccess, \Iterator {
 	 * @return bool
 	 */
 	function firstOrCreate( $param, $data ) {
-		if ( ! $this->where( key( $param ), current( $param ) )->find() ) {
+		if ( ! $this->where( key( $param ), current( $param ) )->first() ) {
 			return $this->insert( $data );
 		} else {
 			return FALSE;
