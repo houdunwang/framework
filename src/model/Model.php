@@ -344,28 +344,6 @@ class Model implements ArrayAccess, Iterator {
 	}
 
 	/**
-	 * 处理字段映射
-	 *
-	 * @param array $data 数据
-	 *
-	 * @return mixed
-	 */
-	final private function parseFieldsMap( array $data ) {
-		if ( ! empty( $this->map ) ) {
-			foreach ( $this->map as $key => $value ) {
-				if ( isset( $data[ $key ] ) ) {
-					$data[ $value ] = $data[ $key ];
-					unset( $data[ $key ] );
-				}
-
-			}
-		}
-
-		return $data;
-	}
-
-
-	/**
 	 * 创建数据对象
 	 *
 	 * @param array $data 生成对象数据
@@ -408,8 +386,6 @@ class Model implements ArrayAccess, Iterator {
 				$data['created_at'] = NOW;
 			}
 		}
-		//字段映射
-		$data = $this->parseFieldsMap( $data );
 		//自动完成
 		$data = $this->autoOperation( $data, $type );
 		//自动过滤
