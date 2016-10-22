@@ -251,16 +251,14 @@ class Model implements ArrayAccess, Iterator {
 	/**
 	 * 自动完成处理
 	 *
-	 * @param $data 数据
-	 * @param int $type 时机
-	 *
-	 * @return mixed
+	 * @return void/mixed
 	 */
-	final private function autoOperation( $data, $type ) {
+	final private function autoOperation() {
 		//不存在自动完成规则
 		if ( empty( $this->auto ) ) {
-			return $data;
+			return;
 		}
+		$data = &$this->data;
 		foreach ( $this->auto as $name => $auto ) {
 			//处理类型
 			$auto[2] = isset( $auto[2] ) ? $auto[2] : 'string';
@@ -284,7 +282,7 @@ class Model implements ArrayAccess, Iterator {
 			} else if ( $auto[3] == self::MUST_AUTO ) {
 				//必须处理
 			}
-			if ( $auto[4] == $type || $auto[4] == self::MODEL_BOTH ) {
+			if ( $auto[4] == $this->actionType() || $auto[4] == self::MODEL_BOTH ) {
 				//为字段设置默认值
 				if ( empty( $data[ $auto[0] ] ) ) {
 					$data[ $auto[0] ] = '';
@@ -298,19 +296,14 @@ class Model implements ArrayAccess, Iterator {
 				}
 			}
 		}
-
-		return $data;
 	}
 
 	/**
 	 * 自动过滤掉满足条件的字段
 	 *
-	 * @param array $data 操作数据
-	 * @param $type 1 增加 2 更新
-	 *
-	 * @return array 处理后的数据
+	 * @return void/array 处理后的数据
 	 */
-	final private function autoFilter( $data, $type ) {
+	final private function autoFilter(  ) {
 		//不存在自动完成规则
 		if ( empty( $this->filter ) ) {
 			return $data;
@@ -353,7 +346,7 @@ class Model implements ArrayAccess, Iterator {
 	final private function create( array $data = [ ] ) {
 		if ( $data ) {
 			//允许填充的数据
-			if ( ! $this->allowFill ) {
+			if ( empty( $this->allowFill ) ) {
 				$data = [ ];
 			} else if ( $this->allowFill[0] != '*' ) {
 				$data = Arr::filter_by_keys( $data, $this->allowFill, 0 );
@@ -367,35 +360,35 @@ class Model implements ArrayAccess, Iterator {
 				}
 			}
 		}
-
-		$data = $data ?: $this->data;
+		$this->data = array_merge( $this->data, $data );
 		//主键为空时删除
-		if ( isset( $data[ $this->pk ] ) ) {
-			if ( empty( $data[ $this->pk ] ) || ! Db::table( $this->table )->find( intval( $data[ $this->pk ] ) ) ) {
-				unset( $data[ $this->pk ] );
+		if ( isset( $this->data[ $this->pk ] ) ) {
+			if ( empty( $this->data[ $this->pk ] ) || ! Db::table( $this->table )->find( intval( $this->data[ $this->pk ] ) ) ) {
+				unset( $this->data[ $this->pk ] );
 			}
 		}
-		//动作类型  1 插入 2 更新
-		$type = empty( $data[ $this->pk ] ) ? self::MODEL_INSERT : self::MODEL_UPDATE;
-
 		//修改更新时间
 		if ( $this->timestamps === TRUE ) {
-			$data['updated_at'] = NOW;
-			if ( $type == self::MODEL_INSERT ) {
+			$this->data['updated_at'] = NOW;
+			if ( $this->actionType() == self::MODEL_INSERT ) {
 				//更新时间
-				$data['created_at'] = NOW;
+				$this->data['created_at'] = NOW;
 			}
 		}
-		//自动完成
-		$data = $this->autoOperation( $data, $type );
-		//自动过滤
-		$data = $this->autoFilter( $data, $type );
-		//自动验证
-		if ( ! $this->autoValidate( $data, $type ) ) {
+		//自动完成/自动过滤/自动验证
+		$this->autoOperation();
+		$this->autoFilter();
+		if ( ! $this->autoValidate() ) {
 			return FALSE;
 		}
+	}
 
-		return $data ?: [ ];
+	/**
+	 * 动作类型
+	 * @return int
+	 */
+	private function actionType() {
+		return empty( $this->data[ $this->pk ] ) ? self::MODEL_INSERT : self::MODEL_UPDATE;
 	}
 
 	/**
@@ -408,7 +401,7 @@ class Model implements ArrayAccess, Iterator {
 	 */
 	final public function save( array $data = [ ] ) {
 		if ( ! $data = $this->create( $data ) ) {
-			throw new \Exception( '没有操作的数据' );
+			throw new \Exception( '没有可操作的数据' );
 		}
 		//更新条件检测
 		$action = empty( $data[ $this->pk ] ) ? 'insertGetId' : 'update';
