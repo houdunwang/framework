@@ -363,6 +363,11 @@ class Model implements ArrayAccess, Iterator {
 			}
 			$this->original = $data;
 		}
+		//不允许设置主键字段
+		if ( isset( $this->original[ $this->pk ] ) ) {
+			unset( $this->original[ $this->pk ] );
+		}
+
 		//更新时设置主键
 		if ( $this->actionType() == self::MODEL_UPDATE ) {
 			$this->original[ $this->pk ] = $this->data[ $this->pk ];
@@ -383,6 +388,16 @@ class Model implements ArrayAccess, Iterator {
 	 */
 	final public function actionType() {
 		return empty( $this->data[ $this->pk ] ) ? self::MODEL_INSERT : self::MODEL_UPDATE;
+	}
+
+	/**
+	 * 更新模型的时间戳
+	 * @return bool
+	 */
+	final public function touch() {
+		if ( $this->actionType() == self::MODEL_UPDATE ) {
+			return Db::table( $this->table )->where( $this->pk, $this->data[ $this->pk ] )->update( [ 'update_at' => NOW ] );
+		}
 	}
 
 	/**
@@ -426,34 +441,19 @@ class Model implements ArrayAccess, Iterator {
 
 	/**
 	 * 删除数据
-	 *
-	 * @param null $id 编号
-	 *
 	 * @return bool
 	 */
 	final public function destory() {
 		//没有查询参数如果模型数据中存在主键值,以主键值做删除条件
-		if ( empty( $this->data[ $this->pk ] ) ) {
-			return false;
-		}
+		if ( ! empty( $this->data[ $this->pk ] ) ) {
+			if ( $this->db->delete( $this->data[ $this->pk ] ) ) {
+				$this->data( [ ] );
 
-		if ( $this->db->delete( $this->data[ $this->pk ] ) ) {
-			$this->data( [ ] );
-
-			return true;
+				return true;
+			}
 		}
 
 		return false;
-	}
-
-	/**
-	 * 更新模型的时间戳
-	 * @return bool
-	 */
-	final public function touch() {
-		$this->updated_at = time();
-
-		return $this->save();
 	}
 
 	/**
