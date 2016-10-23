@@ -313,7 +313,7 @@ class Model implements ArrayAccess, Iterator {
 		if ( empty( $this->filter ) ) {
 			return;
 		}
-		$data = $this->original;
+		$data = &$this->original;
 		foreach ( $this->filter as $filter ) {
 			//验证条件
 			$filter[1] = isset( $filter[1] ) ? $filter[1] : self::EXIST_AUTO;
@@ -342,6 +342,7 @@ class Model implements ArrayAccess, Iterator {
 
 	/**
 	 * 批量设置做准备数据
+	 *
 	 * @param array $data
 	 *
 	 * @return $this
