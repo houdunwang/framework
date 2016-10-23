@@ -99,9 +99,7 @@ class Model implements ArrayAccess, Iterator {
 		if ( empty( $this->pk ) ) {
 			$this->pk = $this->db->getPrimaryKey();
 		}
-		if ( is_numeric( $arg ) ) {
-			$this->data = Db::table( $this->table )->find( $arg ) ?: [ ];
-		} else if ( is_array( $arg ) ) {
+		if ( is_array( $arg ) ) {
 			$this->create( $arg );
 		}
 	}
