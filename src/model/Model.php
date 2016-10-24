@@ -9,7 +9,6 @@
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
 use ArrayAccess;
-use hdphp\traits\HdArrayAccess;
 use Iterator;
 
 class Model implements ArrayAccess, Iterator {
