@@ -348,14 +348,15 @@ class Model implements ArrayAccess, Iterator {
 	 */
 	final public function create( array $data = [ ] ) {
 		if ( ! empty( $data ) ) {
-			//允许填充的数据
-			if ( empty( $this->allowFill ) ) {
+			if ( empty( $this->allowFill ) && empty( $this->denyFill ) ) {
 				$data = [ ];
-			} else if ( $this->allowFill[0] != '*' ) {
+			}
+			//允许填充的数据
+			if ( ! empty( $this->allowFill ) && $this->allowFill[0] != '*' ) {
 				$data = Arr::filter_by_keys( $data, $this->allowFill, 0 );
 			}
 			//禁止填充的数据
-			if ( $this->denyFill ) {
+			if ( ! empty( $this->denyFill ) ) {
 				if ( $this->denyFill[0] == '*' ) {
 					$data = [ ];
 				} else {
