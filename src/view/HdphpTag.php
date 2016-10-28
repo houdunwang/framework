@@ -61,7 +61,7 @@ class HdphpTag extends TagBase {
 		$empty = isset( $attr['empty'] ) ? $attr['empty'] : '';//默认值
 		$row   = isset( $attr['row'] ) ? $attr['row'] : 100;//显示条数
 		$step  = isset( $attr['step'] ) && $attr['step'] > 0 ? $attr['step'] : 1;//间隔
-		$start = isset( $attr['start'] ) ? intval( $attr['start'] ) : 0;//开始数
+		$start = isset( $attr['start'] ) ? intval( $attr['start'] )-1 : 0;//开始数
 		$php
 		       = <<<php
         <?php
@@ -72,15 +72,16 @@ class HdphpTag extends TagBase {
             \$_name= substr('$name',1);
             \$hd['list'][\$_name]['first']=0;
             \$hd['list'][\$_name]['last'] =false;
-            \$hd['list'][\$_name]['total']=\$total=min(floor(count($from)/$step),$row);
+            \$hd['list'][\$_name]['total']=\$total=min(ceil(count($from)/$step),$row);
             \$hd['list'][\$_name]['index']=0;
             \$id=1;
             \$_tmp=$from;
-            for(\$index=$start;\$index<\$total;\$index+=$step){
+            for(\$index=$start;\$index<\$total;\$index++){
                 \$hd['list'][\$_name]['first'] = \$index==$start;
-                \$hd['list'][\$_name]['last']  = (\$index+$step)>=\$total;
                 \$hd['list'][\$_name]['index'] = \$id++;
-                $name=\$_tmp[\$index];
+                \$hd['list'][\$_name]['last']  = \$index>=\$total;
+                if(\$hd['list'][\$_name]['last'])break;
+                $name=\$_tmp[\$index*$step];
             ?>
 php;
 		$php .= $content;
