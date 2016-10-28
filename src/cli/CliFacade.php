@@ -7,21 +7,12 @@
  * |    WeChat: aihoudun
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
-namespace hdphp\error;
+namespace hdphp\cli;
 
-use hdphp\kernel\ServiceProvider;
+use hdphp\kernel\ServiceFacade;
 
-class ErrorProvider extends ServiceProvider {
-
-	//延迟加载
-	public $defer = true;
-
-	public function boot() {
-	}
-
-	public function register() {
-		$this->app->single( 'Error', function ( $app ) {
-			return new Error( $app );
-		} );
+class CliFacade extends ServiceFacade {
+	public static function getFacadeAccessor() {
+		return 'Cli';
 	}
 }

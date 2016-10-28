@@ -24,4 +24,6 @@ class MiddlewareProvider extends ServiceProvider {
 			return new Middleware( $app );
 		} );
 	}
+
+
 }

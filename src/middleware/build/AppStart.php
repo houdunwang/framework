@@ -7,7 +7,7 @@
  */
 class AppStart {
 	//执行中间件
-	public function run() {
+	public function run() {echo 1133;
 		//分配表单验证数据
 		View::with( 'errors', Session::flash( 'errors' ) );
 		//清除闪存

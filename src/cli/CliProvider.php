@@ -7,11 +7,11 @@
  * |    WeChat: aihoudun
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
-namespace hdphp\error;
+namespace hdphp\cli;
 
 use hdphp\kernel\ServiceProvider;
 
-class ErrorProvider extends ServiceProvider {
+class CliProvider extends ServiceProvider {
 
 	//延迟加载
 	public $defer = true;
@@ -20,8 +20,8 @@ class ErrorProvider extends ServiceProvider {
 	}
 
 	public function register() {
-		$this->app->single( 'Error', function ( $app ) {
-			return new Error( $app );
-		} );
+		$this->app->single( 'Cli', function ( $app ) {
+			return new Cli( $app );
+		});
 	}
 }
