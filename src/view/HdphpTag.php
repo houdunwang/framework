@@ -26,9 +26,6 @@ class HdphpTag extends TagBase {
 			'if'        => [ 'block' => TRUE, 'level' => 5 ],
 			'elseif'    => [ 'block' => FALSE ],
 			'else'      => [ 'block' => FALSE ],
-			'jquery'    => [ 'block' => FALSE ],
-			'angular'   => [ 'block' => FALSE ],
-			'bootstrap' => [ 'block' => FALSE ],
 			'js'        => [ 'block' => FALSE ],
 			'css'       => [ 'block' => FALSE ],
 			'include'   => [ 'block' => FALSE ],
@@ -38,36 +35,7 @@ class HdphpTag extends TagBase {
 			'block'     => [ 'block' => TRUE, 'level' => 5 ],
 			'widget'    => [ 'block' => TRUE, 'level' => 5 ],
 			'php'       => [ 'block' => TRUE, 'level' => 5 ],
-			'hdjs'      => [ 'block' => FALSE ],
 		];
-
-	public function _hdjs( $attr, $content, &$view ) {
-		return '<link href="resource/hdjs/css/bootstrap.min.css" rel="stylesheet">
-                <link href="resource/hdjs/css/font-awesome.min.css" rel="stylesheet">
-                <script src="resource/hdjs/js/jquery.min.js"></script>
-                <script src="resource/hdjs/js/bootstrap.min.js"></script>
-                <script src="resource/hdjs/app/util.js"></script>
-                <script src="resource/hdjs/require.js"></script>
-                <script src="resource/hdjs/app/config.js"></script>';
-	}
-
-	//jquery前端库
-	public function _jquery( $attr, $content, &$view ) {
-		return '<script src="'.__ROOT__.'/resource/hdjs/js/jquery.min.js"></script>';
-	}
-
-	//angular.js前端库
-	public function _angular( $attr, $content, &$view ) {
-		return '<script src="'.__ROOT__.'/resource/hdjs/js/angular.min.js"></script>';
-	}
-
-	//bootstrap前端库
-	public function _bootstrap( $attr, $content, &$view ) {
-		return '
-            <link href="'.__ROOT__.'/resource/hdjs/css/bootstrap.min.css" rel="stylesheet">
-            <script src="'.__ROOT__.'/resource/hdjs/js/bootstrap.min.js"></script>
-        ';
-	}
 
 	//加载模板文件
 	public function _include( $attr, $content, &$view ) {
