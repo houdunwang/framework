@@ -21,6 +21,21 @@ class View {
 	protected $compileFile;
 	//缓存目录
 	protected $cacheDir;
+	//缓存时间
+	protected $expire;
+
+	/**
+	 * 初始化模板数据
+	 *
+	 * @param string $file 文件名
+	 */
+	public function init( $file ) {
+		if ( empty( $this->tpl ) ) {
+			$this->cacheDir    = ROOT_PATH . '/storage/view/cache';
+			$this->tpl         = $this->getTemplateFile( $file );
+			$this->compileFile = ROOT_PATH . '/storage/view/' . preg_replace( '/[^\w]/', '_', $this->tpl ) . '_' . substr( md5( $this->tpl ), 0, 5 ) . '.php';
+		}
+	}
 
 	/**
 	 * 解析模板
@@ -31,30 +46,26 @@ class View {
 	 * @return $this
 	 */
 	public function make( $tpl = '', $expire = 0 ) {
-		$this->cacheDir = ROOT_PATH . '/storage/view/cache';
-		//模板文件
-		$this->tpl = $this->getTemplateFile( $tpl );
-		//缓存标识
-		$cacheName = md5( $_SERVER['REQUEST_URI'] . $this->tpl );
+		$this->init( $tpl );
+		$this->expire = $expire;
 		//缓存有效
-		if ( $expire > 0 && $content = Cache::dir( $this->cacheDir )->get( $cacheName ) ) {
+		if ( ! c( 'app.debug' ) && $expire > 0 && $this->isCache() ) {
 			return $this;
 		}
 		//编译文件
-		$this->compileFile = ROOT_PATH . '/storage/view/' . preg_replace( '/[^\w]/', '_', $this->tpl ) . '_' . substr( md5( $this->tpl ), 0, 5 ) . '.php';
-		//编译文件
 		$this->compile();
-		//创建缓存文件
-		if ( $expire > 0 ) {
-			Cache::dir( $this->cacheDir )->set( $cacheName, $content, $expire );
-		}
 
 		return $this;
 	}
 
-	//获取模板文件
-	public function getTpl() {
-		return $this->tpl;
+	//返回模板解析后的字符
+	public function fetch( $tpl = '', $expire = 0 ) {
+		return $this->make( $tpl, $expire )->__toString();
+	}
+
+	//缓存标识
+	protected function getCacheName() {
+		return md5( $_SERVER['REQUEST_URI'] . $this->tpl );
 	}
 
 	//获取编译文件
@@ -62,79 +73,61 @@ class View {
 		return $this->compileFile;
 	}
 
-	/**
-	 * 返回模板解析后的字符
-	 *
-	 * @param string $tpl
-	 * @param int $expire
-	 *
-	 * @return mixed
-	 */
-	public function fetch( $tpl = '', $expire = 0 ) {
-		return $this->make( $tpl, $expire )->__toString();
+	//获取当前实例模板文件
+	public function getTpl() {
+		return $this->tpl;
 	}
 
-	/**
-	 * 获取模板文件
-	 *
-	 * @param $file
-	 *
-	 * @return string
-	 * @throws \Exception
-	 */
+	//根据文件名获取模板文件
 	protected function getTemplateFile( $file ) {
-		//没有扩展名时添加上
-		if ( $file && ! preg_match( '/\.[a-z]+$/i', $file ) ) {
-			$file .= c( 'view.prefix' );
+		if ( empty( $this->tpl ) ) {
+			//没有扩展名时添加上
+			if ( $file && ! preg_match( '/\.[a-z]+$/i', $file ) ) {
+				$file .= c( 'view.prefix' );
+			}
+			if ( ! is_file( $file ) ) {
+				if ( defined( 'MODULE' ) ) {
+					//模块视图文件夹
+					$file = strtolower( MODULE_PATH . '/view/' . CONTROLLER ) . '/' . ( $file ?: ACTION . c( 'view.prefix' ) );
+					if ( ! is_file( $file ) ) {
+						throw new Exception( "模板不存在:$file" );
+					}
+				} else {
+					//路由访问时
+					$file = ROOT_PATH . '/' . c( 'view.path' ) . '/' . $file . c( 'view.prefix' );
+					if ( ! is_file( $file ) ) {
+						throw new Exception( "模板不存在:$file" );
+					}
+				}
+			}
 		}
 
-		if ( is_file( $file ) ) {
-			return $file;
-		}
-		if ( defined( 'MODULE' ) ) {
-			//模块视图文件夹
-			$f = strtolower( MODULE_PATH . '/view/' . CONTROLLER ) . '/' . ( $file ?: ACTION . c( 'view.prefix' ) );
-			if ( is_file( $f ) ) {
-				return $f;
-			}
-		} else {
-			//路由访问时
-			$f = ROOT_PATH . '/' . c( 'view.path' ) . '/' . $file . c( 'view.prefix' );
-			if ( is_file( $f ) ) {
-				return $f;
-			}
-		}
-		throw new Exception( "模板不存在:$f" );
+		return $this->tpl = $file;
 	}
 
-	/**
-	 * 验证缓存文件
-	 *
-	 * @param string $tpl
-	 *
-	 * @return mixed
-	 * @throws \Exception
-	 */
+	//验证缓存文件
 	public function isCache( $tpl = '' ) {
-		//缓存标识
-		$cacheName = md5( $_SERVER['REQUEST_URI'] . $this->getTemplateFile( $tpl ) );
+		static $status = null;
+		$this->init( $tpl );
+		if ( is_null( $status ) ) {
+			$status = Cache::dir( $this->cacheDir )->get( $this->getCacheName() ) ? true : false;
+		}
 
-		return Cache::dir( 'storage/view/cache' )->get( $cacheName );
+		return $status;
+	}
+
+	//删除模板缓存
+	public function delCache() {
+		return Cache::dir( $this->cacheDir )->del( $this->getCacheName() );
 	}
 
 	//编译文件
 	protected function compile() {
 		$status = c( 'app.debug' )
-		          || ! file_exists( $this->compileFile )
 		          || ! is_file( $this->compileFile )
 		          || ( filemtime( $this->tpl ) > filemtime( $this->compileFile ) );
-
 		if ( $status ) {
-			//创建编译目录
-			$dir = dirname( $this->compileFile );
-			if ( ! is_dir( $dir ) ) {
-				mkdir( $dir, 0755, true );
-			}
+			Dir::create( dirname( $this->compileFile ) );
 			//执行文件编译
 			$compile = new Compile( $this );
 			$content = $compile->run();
@@ -164,10 +157,20 @@ class View {
 
 	//显示模板
 	public function __toString() {
-		extract( self::$vars );
-		ob_start();
-		include $this->compileFile;
+		if ( $this->isCache() ) {
+			//缓存有效时返回缓存数据
+			return Cache::dir( $this->cacheDir )->get( $this->getCacheName() ) ?: '';
+		} else {
+			ob_start();
+			extract( self::$vars );
+			include $this->compileFile;
+			$content = ob_get_clean();
+			//创建缓存文件
+			if ( ! c( 'app.debug' ) && $this->expire > 0 ) {
+				Cache::dir( $this->cacheDir )->set( $this->getCacheName(), $content, $this->expire );
+			}
 
-		return ob_get_clean();
+			return $content;
+		}
 	}
 }

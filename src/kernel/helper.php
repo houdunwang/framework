@@ -118,7 +118,7 @@ if ( ! function_exists( '_404' ) ) {
 	function _404() {
 		\Response::sendHttpStatus( 302 );
 		if ( is_file( c( 'view.404' ) ) ) {
-			require( c( 'view.404' ) );
+			die( view( c( 'view.404' ) ) );
 		}
 		exit;
 	}
