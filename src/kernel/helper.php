@@ -19,7 +19,7 @@ if ( ! function_exists( 'tablename' ) ) {
  * 显示模板
  */
 if ( ! function_exists( 'view' ) ) {
-	function view( $tpl = '', $expire = 0 ) {
+	function view( $tpl = '', $expire = null ) {
 		return View::make( $tpl, $expire );
 	}
 }
@@ -187,47 +187,56 @@ if ( ! function_exists( 'go' ) ) {
  * @return bool
  */
 if ( ! function_exists( 'f' ) ) {
-	function f( $name, $value = '[get]', $path = 'storage/cache' ) {
-		static $cache = [ ];
-
-		$file = $path . '/' . $name . '.php';
-
-		if ( $value == '[del]' ) {
-			if ( is_file( $file ) ) {
-				unlink( $file );
-				if ( isset( $cache[ $name ] ) ) {
-					unset( $cache[ $name ] );
-				}
-			}
-
-			return true;
+	function f( $name, $value = '[get]', $expire = 0, $path = '' ) {
+		$path     = $path ?: c( 'cache.file.dir' );
+		$instance = Cache::driver( 'file' )->dir( $path );
+		if ( is_null( $name ) ) {
+			//删除所有缓存
+			return $instance->flush();
 		}
-
-		if ( $value === '[get]' ) {
-			if ( isset( $cache[ $name ] ) ) {
-				return $cache[ $name ];
-			} else if ( is_file( $file ) ) {
-				return $cache[ $name ] = include $file;
-			} else {
-				return false;
-			}
+		switch ( $value ) {
+			case '[get]':
+				//获取
+				return $instance->get( $name );
+			case '[del]':
+				//删除
+				return $instance->del( $name );
+			default:
+				return $instance->set( $name, $value, $expire );
 		}
-
-		$data = "<?php if(!defined('ROOT_PATH'))exit;\nreturn " . var_export( $value, true ) . ";\n?>";
-
-		if ( ! is_dir( $path ) ) {
-			mkdir( $path, 0755, true );
-		}
-
-		if ( ! file_put_contents( $file, $data ) ) {
-			return false;
-		}
-
-		$cache[ $name ] = $value;
-
-		return true;
 	}
 }
+/**
+ * 数据库缓存
+ *
+ * @param $key
+ * @param null $value
+ *
+ * @return mixed
+ */
+if ( ! function_exists( 'd' ) ) {
+	function d( $name, $value = '[get]', $expire = 0 ) {
+		$instance = Cache::driver( 'mysql' );
+		if ( is_null( $name ) ) {
+			//删除所有缓存
+			return $instance->flush();
+		}
+		switch ( $value ) {
+			case '[get]':
+				//获取
+				return $instance->get( $name );
+			case '[del]':
+				//删除
+				return $instance->del( $name );
+			case '[truncate]':
+				//删除所有缓存
+				return $instance->flush( $name );
+			default:
+				return $instance->set( $name, $value, $expire );
+		}
+	}
+}
+
 
 if ( ! function_exists( 'cli' ) ) {
 	function cli() {
@@ -237,38 +246,6 @@ if ( ! function_exists( 'cli' ) ) {
 		}
 		$_SERVER['argv'] = $argv;
 		Cli::bootstrap();
-	}
-}
-/**
- * 快速数据库缓存
- *
- * @param $key
- * @param null $value
- *
- * @return mixed
- */
-if ( ! function_exists( 'd' ) ) {
-	function d( $key, $value = '[get]' ) {
-		$db = Db::table( c( 'cache.mysql.table' ) );
-		switch ( $value ) {
-			case '[get]':
-				//获取
-				$cache = $db->where( '`key`', $key )->pluck( 'value' );
-				if ( $cache ) {
-					return unserialize( $cache );
-				}
-				break;
-			case '[del]':
-				//删除
-				return $db->where( '`key`', '=', $key )->delete();
-			case '[truncate]':
-				//删除所有缓存
-				return $db->truncate();
-			default:
-				$data = [ 'key' => $key, 'value' => serialize( $value ) ];
-
-				return $db->replace( $data );
-		}
 	}
 }
 
