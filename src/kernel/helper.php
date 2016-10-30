@@ -33,7 +33,7 @@ if ( ! function_exists( 'collect' ) ) {
 	 * @return mixed
 	 */
 	function collect( $data ) {
-		return \Collection::make( $data );
+		return Collection::make( $data );
 	}
 }
 if ( ! function_exists( 'nopic' ) ) {
@@ -153,7 +153,6 @@ if ( ! function_exists( 'dd' ) ) {
 		var_dump( $var );
 		echo "<pre>" . ob_get_clean() . "</pre>";
 	}
-	exit;
 }
 
 /**

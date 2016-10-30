@@ -46,16 +46,18 @@ class App extends Container {
 		ServiceFacade::setFacadeApplication( $this );
 		//启动服务
 		$this->boot();
+		//定义错误/异常处理
+		Error::bootstrap();
+		//命令行模式
+		IS_CLI and die( Cli::bootstrap() );
 		//导入类库别名
 		Loader::addMap( c( 'app.alias' ) );
 		//自动加载文件
 		Loader::autoloadFile();
-		//定义错误/异常处理
-		Error::bootstrap();
+		//开启会话
+		Session::start();
 		//应用开始中间件
 		Middleware::exe( 'app_start' );
-		//命令行模式
-		IS_CLI and die( Cli::bootstrap() );
 		//解析路由
 		Route::dispatch();
 		//应用结束中间件
