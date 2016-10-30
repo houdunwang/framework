@@ -56,12 +56,10 @@ class App extends Container {
 		Loader::autoloadFile();
 		//开启会话
 		Session::start();
-		//应用开始中间件
-		Middleware::exe( 'app_start' );
+		//执行全局中间件
+		Middleware::globals();
 		//解析路由
 		Route::dispatch();
-		//应用结束中间件
-		Middleware::exe( 'app_end' );
 	}
 
 	//定义常量
