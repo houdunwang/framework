@@ -236,7 +236,7 @@ if ( ! function_exists( 'cli' ) ) {
 			$argv[] = $v;
 		}
 		$_SERVER['argv'] = $argv;
-		\hdphp\cli\Cli::run();
+		Cli::bootstrap();
 	}
 }
 /**
@@ -504,5 +504,19 @@ if ( ! function_exists( 'csrf_token' ) ) {
 	//CSRF 值
 	function csrf_token() {
 		return Session::get( 'csrf_token' );
+	}
+}
+
+if ( ! function_exists( 'encrypt' ) ) {
+	//加密
+	function encrypt( $content ) {
+		return Crypt::encrypt( $content, 'hdphp.com' );
+	}
+}
+
+if ( ! function_exists( 'decrypt' ) ) {
+	//加密
+	function decrypt( $content ) {
+		return Crypt::decrypt( $content, 'hdphp.com' );
 	}
 }

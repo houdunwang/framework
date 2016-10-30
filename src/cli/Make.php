@@ -107,4 +107,12 @@ class Make extends Cli {
 		$data = str_replace( [ '{{NAME}}' ], [ ucfirst( $name ) ], $data );
 		file_put_contents( $file, $data );
 	}
+
+	//创建应用密钥
+	public function key() {
+		$key     = md5( mt_rand( 1, 99999 ) . NOW ) . md5( mt_rand( 1, 99999 ) . NOW );
+		$content = file_get_contents( 'system/config/app.php' );
+		$content = preg_replace('/(.*("|\')\s*key\s*\2\s*=>\s*)(.*)/im',"\\1'$key',",$content);
+		file_put_contents('system/config/app.php',$content);
+	}
 }
