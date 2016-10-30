@@ -358,19 +358,19 @@ if ( ! function_exists( 'v' ) ) {
  *
  * @return mixed
  */
-if ( ! function_exists( 'unaddslashes' ) ) {
-	function unaddslashes( &$data ) {
-		foreach ( (array) $data as $k => $v ) {
-			if ( is_numeric( $v ) ) {
-				$data[ $k ] = $v;
-			} else {
-				$data[ $k ] = is_array( $v ) ? unaddslashes( $v ) : stripslashes( $v );
-			}
-		}
-
-		return $data;
-	}
-}
+//if ( ! function_exists( 'unaddslashes' ) ) {
+//	function unaddslashes( &$data ) {
+//		foreach ( (array) $data as $k => $v ) {
+//			if ( is_numeric( $v ) ) {
+//				$data[ $k ] = $v;
+//			} else {
+//				$data[ $k ] = is_array( $v ) ? unaddslashes( $v ) : stripslashes( $v );
+//			}
+//		}
+//
+//		return $data;
+//	}
+//}
 
 if ( ! function_exists( 'confirm' ) ) {
 	/**

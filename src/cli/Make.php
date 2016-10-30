@@ -24,7 +24,7 @@ class Make extends Cli {
 			$this->error( 'Controller file already exists' );
 		} else {
 			$data = file_get_contents( __DIR__ . '/view/' . ucfirst( $type ) . '.tpl' );
-			$data = str_replace( [ '{{APP}}', '{{MODULE}}', '{{CONTROLLER}}' ], [ $this->config['app']['path'], $MODULE, $CONTROLLER ], $data );
+			$data = str_replace( [ '{{APP}}', '{{MODULE}}', '{{CONTROLLER}}' ], [ c('app.path'), $MODULE, $CONTROLLER ], $data );
 			file_put_contents( $file, $data );
 		}
 	}
