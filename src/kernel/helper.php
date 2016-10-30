@@ -153,6 +153,7 @@ if ( ! function_exists( 'dd' ) ) {
 		var_dump( $var );
 		echo "<pre>" . ob_get_clean() . "</pre>";
 	}
+	exit;
 }
 
 /**
