@@ -12,6 +12,8 @@ namespace hdphp\route;
 use Closure;
 
 class Compile extends Setting {
+	//匹配到路由
+	protected $found = false;
 	//路由参数
 	protected $args = [ ];
 
@@ -25,8 +27,7 @@ class Compile extends Setting {
 				return false;
 			}
 			//设置GET参数
-			$this->args = $_GET = array_merge( $this->route[ $key ]['get'], $_GET );
-
+			$this->args = $this->route[ $key ]['get'];
 			return $this->found = true;
 		}
 	}
