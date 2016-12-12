@@ -103,19 +103,11 @@ class Compile extends Setting {
 
 	//PUT事件处理
 	protected function _put( $key ) {
-		if ( empty( $_POST ) ) {
-			parse_str( file_get_contents( 'php://input' ), $_POST );
-		}
-
 		return IS_PUT && $this->isMatch( $key ) && $this->exec( $key );
 	}
 
 	//DELETE事件
 	protected function _delete( $key ) {
-		if ( empty( $_POST ) ) {
-			parse_str( file_get_contents( 'php://input' ), $_POST );
-		}
-
 		return IS_DELETE && $this->isMatch( $key ) && $this->exec( $key );
 	}
 

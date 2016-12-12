@@ -7,13 +7,14 @@
 class Csrf {
 	public function run() {
 		//获取令牌,不存在时创建令牌
-		if ( ! $token = Session::get( 'csrf_token' ) ) {
+		$open = Config::get( 'csrf.open' );
+		if ( $open && ! $token = Session::get( 'csrf_token' ) ) {
 			$token = md5( clientIp() . microtime( true ) );
 			Session::set( 'csrf_token', $token );
 		}
 
 		//令牌检测
-		if ( IS_POST && Config::get( 'csrf.open' ) ) {
+		if ( IS_POST && $open ) {echo 333;
 			if ( Request::post( 'csrf_token' ) != $token ) {
 				/**
 				 * 存在过滤的验证时忽略验证

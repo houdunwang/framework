@@ -65,6 +65,7 @@ class Route extends Compile {
 			$this->route[ count( $this->route ) - 1 ]['where'][ $name ] = '#^' . $regexp . '$#';
 		}
 
+		return $this;
 	}
 
 	/**
@@ -141,7 +142,11 @@ class Route extends Compile {
 	 *
 	 * @return mixed|null
 	 */
-	public function input( $name ) {
-		return isset( $this->args[ $name ] ) ? $this->args[ $name ] : null;
+	public function input( $name = null ) {
+		if ( is_null( $name ) ) {
+			return $this->args;
+		} else {
+			return isset( $this->args[ $name ] ) ? $this->args[ $name ] : null;
+		}
 	}
 }
