@@ -39,10 +39,28 @@ class Request {
 	}
 
 	/**
+	 * 设置值
+	 *
+	 * @param $name 类型如get.name,post.id
+	 * @param $value
+	 *
+	 * @return bool
+	 */
+	public function set( $name, $value ) {
+		$info   = explode( '.', $name );
+		$action = strtoupper( array_shift( $info ) );
+		if ( isset( self::$items[ $action ] ) ) {
+			self::$items[ $action ] = Arr::set( self::$items[ $action ], implode( '.', $info ), $value );
+
+			return true;
+		}
+	}
+
+	/**
 	 * 获取数据
 	 * 示例: Request::get('name')
 	 *
-	 * @param $action
+	 * @param $action 类型如get,post
 	 * @param $arguments 参数结构如下
 	 * [
 	 *  'name'=>'变量名',//config.a 可选
@@ -94,6 +112,16 @@ class Request {
 		$clientIp = $long ? [ $ip, $long ] : [ "0.0.0.0", 0 ];
 
 		return $clientIp[ $type ];
+	}
+
+	//判断请求来源是否为本网站域名
+	public function isDomain() {
+		if ( isset( $_SERVER['HTTP_REFERER'] ) ) {
+			$referer = parse_url( $_SERVER['HTTP_REFERER'] );
+			$root    = parse_url( __ROOT__ );
+
+			return $referer['host'] == $root['host'];
+		}
 	}
 
 	//https请求

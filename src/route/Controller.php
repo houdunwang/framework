@@ -35,8 +35,8 @@ class Controller {
 				array_unshift( $param, c( 'http.default_module' ) );
 				break;
 		}
-		$_GET[ c( 'http.url_var' ) ] = implode( '/', $param );
-		$param[1]                    = preg_replace_callback( '/_([a-z])/', function ( $matches ) {
+		Request::set( 'get.' . c( 'http.url_var' ), implode( '/', $param ) );
+		$param[1] = preg_replace_callback( '/_([a-z])/', function ( $matches ) {
 			return ucfirst( $matches[1] );
 		}, $param[1] );
 		define( 'MODULE', $param[0] );

@@ -28,6 +28,7 @@ class Compile extends Setting {
 			}
 			//设置GET参数
 			$this->args = $this->route[ $key ]['get'];
+
 			return $this->found = true;
 		}
 	}
@@ -86,7 +87,7 @@ class Compile extends Setting {
 			echo $reflectionFunction->invokeArgs( $args );
 		} else {
 			//设置控制器与方法
-			$_GET[ c( 'http.url_var' ) ] = $this->route[ $key ]['callback'];
+			Request::set( 'get.' . c( 'http.url_var' ), $this->route[ $key ]['callback'] );
 			Controller::run( $this->route[ $key ]['get'] );
 		}
 	}
