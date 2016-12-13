@@ -110,7 +110,6 @@ class App extends Container {
 		if ( $this->booted ) {
 			return;
 		}
-
 		foreach ( $this->serviceProviders as $p ) {
 			$this->bootProvider( $p );
 		}
