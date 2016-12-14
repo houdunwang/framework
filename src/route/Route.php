@@ -53,10 +53,12 @@ class Route extends Compile {
 	/**
 	 * 使用正则表达式限制参数
 	 *
-	 * @param $name
-	 * @param null $regexp
+	 * @param mixed $name
+	 * @param string $regexp
+	 *
+	 * @return $this
 	 */
-	public function where( $name, $regexp = null ) {
+	public function where( $name, $regexp = '' ) {
 		if ( is_array( $name ) ) {
 			foreach ( $name as $k => $v ) {
 				$this->route[ count( $this->route ) - 1 ]['where'][ $k ] = '#^' . $v . '$#';
