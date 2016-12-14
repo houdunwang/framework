@@ -31,7 +31,6 @@ return [
 		'hdphp\rbac\RbacProvider',
 		'hdphp\request\RequestProvider',
 		'hdphp\string\StrProvider',
-		'hdphp\upload\UploadProvider',
 		'hdphp\validate\ValidateProvider',
 		'hdphp\view\ViewProvider',
 		'hdphp\zip\ZipProvider',
@@ -42,6 +41,7 @@ return [
 		'hdphp\collection\CollectionProvider',
 		'wechat\WeChatProvider',
 
+		'houdunwang\upload\UploadProvider',
 		'houdunwang\response\ResponseProvider',
 		'houdunwang\xml\XmlProvider',
 	],
@@ -76,7 +76,6 @@ return [
 		'Route'      => 'hdphp\route\RouteFacade',
 		'Session'    => 'hdphp\session\SessionFacade',
 		'Str'        => 'hdphp\string\StrFacade',
-		'Upload'     => 'hdphp\upload\UploadFacade',
 		'Validate'   => 'hdphp\validate\ValidateFacade',
 		'View'       => 'hdphp\view\ViewFacade',
 		'Zip'        => 'hdphp\zip\ZipFacade',
@@ -87,7 +86,9 @@ return [
 		'Schema'     => 'hdphp\database\SchemaFacade',
 		'Collection' => 'hdphp\collection\CollectionFacade',
 		'WeChat'     => 'wechat\WeChatFacade',
-		'Xml'        => 'houdunwang\xml\XmlFacade',
-		'Response'   => 'houdunwang\response\ResponseFacade',
+
+		'Upload'   => 'houdunwang\upload\UploadFacade',
+		'Xml'      => 'houdunwang\xml\XmlFacade',
+		'Response' => 'houdunwang\response\ResponseFacade',
 	],
 ];
