@@ -15,7 +15,7 @@
   },
   "autoload": {
     "files": [
-      "src/kernel/helper.php" 
+      "src/kernel/helper.php"
     ],
     "psr-4": {
       "hdphp\\": "src/"
