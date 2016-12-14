@@ -12,7 +12,8 @@
   "minimum-stability": "stable",
   "require": {
     "houdunwang/response": "~1.0",
-    "houdunwang/xml": "~1.0"
+    "houdunwang/xml": "~1.0",
+    "houdunwang/wechat": "~1.0"
   },
   "autoload": {
     "files": [
