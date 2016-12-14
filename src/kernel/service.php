@@ -33,7 +33,7 @@ return [
 		'hdphp\string\StrProvider',
 		'hdphp\validate\ValidateProvider',
 		'hdphp\view\ViewProvider',
-		'hdphp\zip\ZipProvider',
+
 		'hdphp\form\FormProvider',
 		'hdphp\tool\ToolProvider',
 		'hdphp\cloud\CloudProvider',
@@ -41,6 +41,7 @@ return [
 		'hdphp\collection\CollectionProvider',
 		'wechat\WeChatProvider',
 
+		'houdunwang\zip\ZipProvider',
 		'houdunwang\upload\UploadProvider',
 		'houdunwang\response\ResponseProvider',
 		'houdunwang\xml\XmlProvider',
@@ -78,7 +79,6 @@ return [
 		'Str'        => 'hdphp\string\StrFacade',
 		'Validate'   => 'hdphp\validate\ValidateFacade',
 		'View'       => 'hdphp\view\ViewFacade',
-		'Zip'        => 'hdphp\zip\ZipFacade',
 		'Middleware' => 'hdphp\middleware\MiddlewareFacade',
 		'Form'       => 'hdphp\form\FormFacade',
 		'Tool'       => 'hdphp\tool\ToolFacade',
@@ -87,6 +87,7 @@ return [
 		'Collection' => 'hdphp\collection\CollectionFacade',
 		'WeChat'     => 'wechat\WeChatFacade',
 
+		'Zip'      => 'houdunwang\zip\ZipFacade',
 		'Upload'   => 'houdunwang\upload\UploadFacade',
 		'Xml'      => 'houdunwang\xml\XmlFacade',
 		'Response' => 'houdunwang\response\ResponseFacade',
