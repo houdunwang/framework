@@ -10,8 +10,8 @@
     }
   ],
   "require": {
-    "houdunwang/response": "~1.0",
-    "houdunwang/xml": "~1.0"
+    "houdunwang/response": "dev-master",
+    "houdunwang/xml": "dev-master"
   },
   "autoload": {
     "files": [
