@@ -15,7 +15,8 @@
     "houdunwang/xml": "~1.0",
     "houdunwang/wechat": "~1.0",
     "houdunwang/upload": "~1.0",
-    "houdunwang/zip": "~1.0"
+    "houdunwang/zip": "~1.0",
+    "houdunwang/arr": "~1.0"
   },
   "autoload": {
     "files": [
