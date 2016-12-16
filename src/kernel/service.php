@@ -19,7 +19,6 @@ return [
 		'hdphp\curl\CurlProvider',
 		'hdphp\data\DataProvider',
 		'hdphp\db\DbProvider',
-		'hdphp\dir\DirProvider',
 		'hdphp\log\LogProvider',
 		'hdphp\lang\LangProvider',
 		'hdphp\mail\MailProvider',
@@ -35,6 +34,7 @@ return [
 		'hdphp\collection\CollectionProvider',
 		'wechat\WeChatProvider',
 
+		'houdunwang\dir\DirProvider',
 		'houdunwang\tool\ToolProvider',
 		'houdunwang\str\StrProvider',
 		'houdunwang\crypt\CryptProvider',
@@ -62,7 +62,6 @@ return [
 		'Curl'       => 'hdphp\curl\CurlFacade',
 		'Data'       => 'hdphp\data\DataFacade',
 		'Db'         => 'hdphp\db\DbFacade',
-		'Dir'        => 'hdphp\dir\DirFacade',
 		'Log'        => 'hdphp\log\LogFacade',
 		'Lang'       => 'hdphp\lang\LangFacade',
 		'Mail'       => 'hdphp\mail\MailFacade',
@@ -81,6 +80,7 @@ return [
 		'Collection' => 'hdphp\collection\CollectionFacade',
 		'WeChat'     => 'wechat\WeChatFacade',
 
+		'Dir'        => 'houdunwang\dir\DirFacade',
 		'Tool'     => 'houdunwang\tool\ToolFacade',
 		'Str'      => 'houdunwang\str\StrFacade',
 		'Crypt'    => 'houdunwang\crypt\CryptFacade',
