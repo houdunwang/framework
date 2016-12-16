@@ -21,7 +21,8 @@
     "houdunwang/image": "~1.0",
     "houdunwang/html": "~1.0",
     "houdunwang/crypt": "~1.0",
-    "houdunwang/str": "~1.0"
+    "houdunwang/str": "~1.0",
+    "houdunwang/curl": "~1.0"
   },
   "autoload": {
     "files": [
