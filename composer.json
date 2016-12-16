@@ -18,7 +18,8 @@
     "houdunwang/zip": "~1.0",
     "houdunwang/arr": "~1.0",
     "houdunwang/page": "~1.0",
-    "houdunwang/image": "~1.0"
+    "houdunwang/image": "~1.0",
+    "houdunwang/html": "~1.0"
   },
   "autoload": {
     "files": [
