@@ -82,7 +82,7 @@ class Collection implements \Iterator, \ArrayAccess {
 	 * Offset to retrieve
 	 * @link http://php.net/manual/en/arrayaccess.offsetget.php
 	 *
-	 * @param mixed $offset <p>
+	 * @param mixed $key <p>
 	 * The offset to retrieve.
 	 * </p>
 	 *
@@ -115,7 +115,7 @@ class Collection implements \Iterator, \ArrayAccess {
 	 * Offset to unset
 	 * @link http://php.net/manual/en/arrayaccess.offsetunset.php
 	 *
-	 * @param mixed $offset <p>
+	 * @param mixed $key <p>
 	 * The offset to unset.
 	 * </p>
 	 *

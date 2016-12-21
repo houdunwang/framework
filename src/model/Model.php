@@ -437,6 +437,7 @@ class Model implements ArrayAccess, Iterator {
 				break;
 		}
 		$this->original = [ ];
+
 		return $res;
 	}
 
@@ -489,7 +490,9 @@ class Model implements ArrayAccess, Iterator {
 	 * @return mixed
 	 */
 	public function __call( $method, $params ) {
-		return call_user_func_array( [ $this->db, $method ], $params );
+		$res = call_user_func_array( [ $this->db, $method ], $params );
+
+		return self::returnParse( $method, $res, $this );
 	}
 
 	/**
@@ -506,7 +509,25 @@ class Model implements ArrayAccess, Iterator {
 			self::$links[ $model ] = ( new static() );
 		}
 		$query = self::$links[ $model ];
+		$res   = call_user_func_array( [ $query, $method ], $params );
 
-		return call_user_func_array( [ $query, $method ], $params );
+		return self::returnParse( $method, $res, self::$links[ $model ] );
+	}
+
+	protected static function returnParse( $method, $result, $model ) {
+		switch ( strtolower( $method ) ) {
+			case 'find':
+			case 'first':
+				$instance = clone $model;
+				return $instance->data( $result );
+			case 'get':
+				$Collection = Collection::make( [ ] );
+				foreach ( $result as $k => $v ) {
+					$instance         = clone $model;
+					$Collection[ $k ] = $instance->data( $v );
+				}
+
+				return $Collection;
+		}
 	}
 }
