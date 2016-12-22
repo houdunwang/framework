@@ -23,19 +23,7 @@ if ( ! function_exists( 'view' ) ) {
 		return View::make( $tpl, $expire );
 	}
 }
-/**
- * 集合
- */
-if ( ! function_exists( 'collect' ) ) {
-	/**
-	 * @param $data
-	 *
-	 * @return mixed
-	 */
-	function collect( $data ) {
-		return Collection::make( $data );
-	}
-}
+
 if ( ! function_exists( 'nopic' ) ) {
 	function nopic( $file ) {
 		return is_file( $file ) ? $file : 'resource/images/nopic.jpg';
