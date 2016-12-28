@@ -7,15 +7,14 @@
  * |    WeChat: aihoudun
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
-namespace hdphp\kernel;
-
+namespace houdunwang\framework;
 /**
  * 服务抽象类
  */
 abstract class ServiceProvider {
 
 	//延迟加载
-	public $defer = FALSE;
+	public $defer = false;
 
 	//应用程序实例
 	protected $app;

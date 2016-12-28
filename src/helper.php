@@ -8,22 +8,6 @@
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
 
-//表名加前缀
-if ( ! function_exists( 'tablename' ) ) {
-	function tablename( $table ) {
-		return c( 'database.prefix' ) . $table;
-	}
-}
-
-/**
- * 显示模板
- */
-if ( ! function_exists( 'view' ) ) {
-	function view( $tpl = '', $expire = null ) {
-		return View::make( $tpl, $expire );
-	}
-}
-
 if ( ! function_exists( 'nopic' ) ) {
 	function nopic( $file ) {
 		return is_file( $file ) ? $file : 'resource/images/nopic.jpg';
@@ -65,20 +49,6 @@ if ( ! function_exists( 'u' ) ) {
 }
 
 /**
- * 请求参数
- *
- * @param $var 变量名
- * @param null $default 默认值
- * @param string $filter 数据处理函数
- *
- * @return mixed
- */
-if ( ! function_exists( 'q' ) ) {
-	function q( $var, $default = null, $filter = '' ) {
-		return Request::query( $var, $default, $filter );
-	}
-}
-/**
  * 输出404页面
  */
 if ( ! function_exists( '_404' ) ) {
@@ -90,17 +60,7 @@ if ( ! function_exists( '_404' ) ) {
 		exit;
 	}
 }
-if ( ! function_exists( 'model' ) ) {
-	function model( $model ) {
-		static $instance = [ ];
-		$class = strpos( $model, '\\' ) === false ? '\system\model\\' . ucfirst( $model ) : $model;
-		if ( isset( $instance[ $class ] ) ) {
-			return $instance[ $class ];
-		}
 
-		return $instance[ $class ] = new $class;
-	}
-}
 
 /**
  * 打印输出数据
@@ -145,16 +105,7 @@ if ( ! function_exists( 'go' ) ) {
 	}
 }
 
-if ( ! function_exists( 'cli' ) ) {
-	function cli() {
-		$argv[] = 'hd';
-		foreach ( func_get_args() as $v ) {
-			$argv[] = $v;
-		}
-		$_SERVER['argv'] = $argv;
-		Cli::bootstrap();
-	}
-}
+
 
 /**
  * 导入类库
@@ -181,21 +132,6 @@ if ( ! function_exists( 'print_const' ) ) {
 	}
 }
 
-/**
- * trace
- *
- * @param string $value 变量
- * @param string $label 标签
- * @param string $level 日志级别(或者页面Trace的选项卡)
- * @param bool|false $record 是否记录日志
- *
- * @return mixed
- */
-if ( ! function_exists( 'trace' ) ) {
-	function trace( $value = '[hdphp]', $label = '', $level = 'DEBUG', $record = false ) {
-		return Error::trace( $value, $label, $level, $record );
-	}
-}
 /**
  * 全局变量
  *
@@ -236,27 +172,6 @@ if ( ! function_exists( 'v' ) ) {
 	}
 }
 
-/**
- * 反转义
- *
- * @param array $data
- *
- * @return mixed
- */
-//if ( ! function_exists( 'unaddslashes' ) ) {
-//	function unaddslashes( &$data ) {
-//		foreach ( (array) $data as $k => $v ) {
-//			if ( is_numeric( $v ) ) {
-//				$data[ $k ] = $v;
-//			} else {
-//				$data[ $k ] = is_array( $v ) ? unaddslashes( $v ) : stripslashes( $v );
-//			}
-//		}
-//
-//		return $data;
-//	}
-//}
-
 if ( ! function_exists( 'confirm' ) ) {
 	/**
 	 * 有确定提示的提示页面
@@ -272,52 +187,9 @@ if ( ! function_exists( 'confirm' ) ) {
 	}
 }
 
-if ( ! function_exists( 'ajax' ) ) {
-	/**
-	 * Ajax输出
-	 *
-	 * @param  mixed $data 数据
-	 * @param string $type 数据类型 text html xml json
-	 */
-	function ajax( $data, $type = "JSON" ) {
-		Response::ajax( $data, $type );
-	}
-}
 
-/**
- * 获取客户端ip
- */
-if ( ! function_exists( 'clientIp' ) ) {
-	function clientIp( $type = 0 ) {
-		$type = intval( $type );
-		//保存客户端IP地址
-		if ( isset( $_SERVER ) ) {
-			if ( isset( $_SERVER["HTTP_X_FORWARDED_FOR"] ) ) {
-				$ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
-			} else if ( isset( $_SERVER["HTTP_CLIENT_IP"] ) ) {
-				$ip = $_SERVER["HTTP_CLIENT_IP"];
-			} else if ( isset( $_SERVER["REMOTE_ADDR"] ) ) {
-				$ip = $_SERVER["REMOTE_ADDR"];
-			} else {
-				return '';
-			}
-		} else {
-			if ( getenv( "HTTP_X_FORWARDED_FOR" ) ) {
-				$ip = getenv( "HTTP_X_FORWARDED_FOR" );
-			} else if ( getenv( "HTTP_CLIENT_IP" ) ) {
-				$ip = getenv( "HTTP_CLIENT_IP" );
-			} else if ( getenv( "REMOTE_ADDR" ) ) {
-				$ip = getenv( "REMOTE_ADDR" );
-			} else {
-				return '';
-			}
-		}
-		$long     = ip2long( $ip );
-		$clientIp = $long ? [ $ip, $long ] : [ "0.0.0.0", 0 ];
 
-		return $clientIp[ $type ];
-	}
-}
+
 
 if ( ! function_exists( 'message' ) ) {
 	/**
@@ -395,19 +267,5 @@ if ( ! function_exists( 'csrf_token' ) ) {
 	//CSRF 值
 	function csrf_token() {
 		return Session::get( 'csrf_token' );
-	}
-}
-
-if ( ! function_exists( 'encrypt' ) ) {
-	//加密
-	function encrypt( $content ) {
-		return Crypt::encrypt( $content, 'hdphp.com' );
-	}
-}
-
-if ( ! function_exists( 'decrypt' ) ) {
-	//加密
-	function decrypt( $content ) {
-		return Crypt::decrypt( $content, 'hdphp.com' );
 	}
 }

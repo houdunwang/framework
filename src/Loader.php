@@ -7,11 +7,19 @@
  * |    WeChat: aihoudun
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
-namespace hdphp\kernel;
+namespace houdunwang\framework;
 
 class Loader {
 	// 类库映射
 	protected static $alias = [ ];
+
+	//初始
+	public static function bootstrap() {
+		//导入类库别名
+		Loader::addMap( Config::get( 'app.alias' ) );
+		//自动加载文件
+		Loader::autoloadFile();
+	}
 
 	// 注册自动加载机制
 	public static function register( $autoload = '' ) {
@@ -46,10 +54,10 @@ class Loader {
 			require_once str_replace( '\\', DS, self::$alias[ $class ] );
 		} else if ( is_file( ROOT_PATH . DS . $file ) ) {
 			require_once ROOT_PATH . DS . $file;
-		} else if ( class_exists( 'Config', FALSE ) ) {
+		} else if ( class_exists( 'Config', false ) ) {
 			//自动加载命名空间
 			foreach ( (array) \Config::get( 'app.autoload_namespace' ) as $key => $value ) {
-				if ( strpos( $class, $key ) !== FALSE ) {
+				if ( strpos( $class, $key ) !== false ) {
 					$file = str_replace( $key, $value, $class ) . '.php';
 					require_once( str_replace( '\\', DS, $file ) );
 				}
