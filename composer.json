@@ -55,7 +55,7 @@
   },
   "autoload": {
     "files": [
-      "src/kernel/helper.php"
+      "src/helper.php"
     ],
     "psr-4": {
       "houdunwang\\framework\\": "src"
