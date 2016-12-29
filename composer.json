@@ -51,7 +51,8 @@
     "houdunwang/view": "dev-master",
     "houdunwang/xml": "dev-master",
     "houdunwang/zip": "dev-master",
-    "houdunwang/weixin": "dev-master"
+    "houdunwang/weixin": "dev-master",
+    "houdunwang/loader": "dev-master"
   },
   "autoload": {
     "files": [
