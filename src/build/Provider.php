@@ -7,11 +7,11 @@
  * |    WeChat: aihoudun
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
-namespace houdunwang\framework;
+namespace houdunwang\framework\build;
 /**
  * 服务抽象类
  */
-abstract class ServiceProvider {
+abstract class Provider {
 
 	//延迟加载
 	public $defer = false;

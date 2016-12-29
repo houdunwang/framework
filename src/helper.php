@@ -7,21 +7,28 @@
  * |    WeChat: aihoudun
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
-
 if ( ! function_exists( 'nopic' ) ) {
+	/**
+	 * 模板中显示默认图片
+	 *
+	 * @param $file
+	 *
+	 * @return string
+	 */
 	function nopic( $file ) {
 		return is_file( $file ) ? $file : 'resource/images/nopic.jpg';
 	}
 }
-/**
- * 生成url
- *
- * @param string $path 模块/动作/方法
- * @param array $args GET参数
- *
- * @return mixed|string
- */
+
 if ( ! function_exists( 'u' ) ) {
+	/**
+	 * 生成url
+	 *
+	 * @param string $path 模块/动作/方法
+	 * @param array $args GET参数
+	 *
+	 * @return mixed|string
+	 */
 	function u( $path, $args = [ ] ) {
 		if ( empty( $path ) || preg_match( '@^http@i', $path ) ) {
 			return $path;
@@ -61,20 +68,21 @@ if ( ! function_exists( '_404' ) ) {
 	}
 }
 
-
-/**
- * 打印输出数据
- *
- * @param $var
- */
 if ( ! function_exists( 'p' ) ) {
+	/**
+	 * 打印输出数据
+	 * @param $var
+	 */
 	function p( $var ) {
 		echo "<pre>" . print_r( $var, true ) . "</pre>";
 	}
 }
 
-//打印数据有数据类型
 if ( ! function_exists( 'dd' ) ) {
+	/**
+	 * 打印数据有数据类型
+	 * @param $var
+	 */
 	function dd( $var ) {
 		ob_start();
 		var_dump( $var );
@@ -82,14 +90,13 @@ if ( ! function_exists( 'dd' ) ) {
 	}
 }
 
-/**
- * 跳转网址
- *
- * @param $url
- * @param int $time
- * @param string $msg
- */
 if ( ! function_exists( 'go' ) ) {
+	/**
+	 * 跳转网址
+	 * @param string $url url地址
+	 * @param int $time 等待时间
+	 * @param string $msg 提示信息
+	 */
 	function go( $url, $time = 0, $msg = '' ) {
 		$url = u( $url );
 		if ( ! headers_sent() ) {
@@ -105,42 +112,24 @@ if ( ! function_exists( 'go' ) ) {
 	}
 }
 
-
-
-/**
- * 导入类库
- *
- * @param string $class
- *
- * @return bool
- */
-if ( ! function_exists( 'import' ) ) {
-	function import( $class ) {
-		$file = str_replace( [ '@', '.', '#' ], [ APP_PATH, '/', '.' ], $class );
-		if ( is_file( $file ) ) {
-			require_once $file;
-		} else {
-			return false;
-		}
-	}
-}
-//打印用户常量
 if ( ! function_exists( 'print_const' ) ) {
+	/**
+	 * 打印用户常量
+	 */
 	function print_const() {
 		$d = get_defined_constants( true );
-		p( $d['form'] );
+		p( $d['user'] );
 	}
 }
 
-/**
- * 全局变量
- *
- * @param $name 变量名
- * @param string $value 变量值
- *
- * @return mixed 返回值
- */
 if ( ! function_exists( 'v' ) ) {
+	/**
+	 * 全局变量
+	 * @param null $name 变量名
+	 * @param string $value 变量值
+	 *
+	 * @return array|mixed|null|string
+	 */
 	function v( $name = null, $value = '[null]' ) {
 		static $vars = [ ];
 		if ( is_null( $name ) ) {
@@ -186,10 +175,6 @@ if ( ! function_exists( 'confirm' ) ) {
 		exit;
 	}
 }
-
-
-
-
 
 if ( ! function_exists( 'message' ) ) {
 	/**
@@ -248,23 +233,33 @@ if ( ! function_exists( 'message' ) ) {
 	}
 }
 
-
 if ( ! function_exists( 'csrf_field' ) ) {
-	//CSRF 表单
+	/**
+	 * CSRF 表单
+	 * @return string
+	 */
 	function csrf_field() {
 		return "<input type='hidden' name='csrf_token' value='" . Session::get( 'csrf_token' ) . "'/>\r\n";
 	}
 }
 
 if ( ! function_exists( 'method_field' ) ) {
-	//CSRF 表单
-	function method_field($type) {
-		return "<input type='hidden' name='_method' value='" .strtoupper($type) . "'/>\r\n";
+	/**
+	 * CSRF 表单
+	 * @param $type
+	 *
+	 * @return string
+	 */
+	function method_field( $type ) {
+		return "<input type='hidden' name='_method' value='" . strtoupper( $type ) . "'/>\r\n";
 	}
 }
 
 if ( ! function_exists( 'csrf_token' ) ) {
-	//CSRF 值
+	/**
+	 * CSRF 值
+	 * @return mixed
+	 */
 	function csrf_token() {
 		return Session::get( 'csrf_token' );
 	}

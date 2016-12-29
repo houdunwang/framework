@@ -7,11 +7,11 @@
  * |    WeChat: aihoudun
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
-namespace houdunwang\framework;
+namespace houdunwang\framework\build;
 
 use RuntimeException;
 
-abstract class ServiceFacade {
+abstract class Facade {
 	protected static $app;
 
 	public static $resolvedInstance = [ ];
