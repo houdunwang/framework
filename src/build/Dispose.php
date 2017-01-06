@@ -36,15 +36,7 @@ class Dispose {
 	}
 
 	protected static function error() {
-		$config = [
-			//开启时直接显示错误信息
-			'debug'       => Config::get( 'app.debug' ),
-			//Notice类型错误显示
-			'show_notice' => Config::get( 'error.show_notice' ),
-			//错误提示页面
-			'bug'         => Config::get( 'view.bug' )
-		];
-		Config::set( 'error', $config );
+		Config::set( 'error.debug', Config::get( 'app.debug' ) );
 	}
 
 	//设置数据库连接配置
@@ -111,5 +103,9 @@ class Dispose {
 			'houdunwang\framework\middleware\Csrf'
 		] );
 		c( 'middleware.global', array_unique( $config ) );
+
+		//控制器访问时控制器或方法不存在时执行的中间件
+		c('middleware.web.CONTROLLER_NOT_FOUND',['houdunwang\framework\middleware\ControllerNotFound']);
+		c('middleware.web.ACTION_NOT_FOUND',['houdunwang\framework\middleware\ActionNotFound']);
 	}
 }
