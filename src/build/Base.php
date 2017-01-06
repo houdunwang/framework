@@ -8,7 +8,13 @@
 // | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
 // '-------------------------------------------------------------------
 
+use houdunwang\cli\Cli;
 use houdunwang\config\Config;
+use houdunwang\error\Error;
+use houdunwang\loader\Loader;
+use houdunwang\middleware\Middleware;
+use houdunwang\route\Route;
+use houdunwang\session\Session;
 use ReflectionClass;
 
 class Base extends \houdunwang\container\build\Base {
@@ -28,15 +34,29 @@ class Base extends \houdunwang\container\build\Base {
 		$this->constant();
 		//加载配置文件
 		Dispose::bootstrap();
+		Error::bootstrap();
+		//设置自动加载
+		Loader::register( [ $this, 'autoload' ] );
+		//自动加载系统服务
+		Loader::bootstrap();
 		$this->servers = Config::get( 'service' );
 		//添加初始实例
 		$this->instance( 'App', $this );
 		//绑定核心服务提供者
 		$this->bindServiceProvider();
 		//设置外观类APP属性
-		ServiceFacade::setFacadeApplication( $this );
+		Facade::setFacadeApplication( $this );
 		//启动服务
 		$this->boot();
+		//执行命令行指令
+		Cli::bootstrap();
+		//开启SESSION
+		Session::bootstrap();
+		//执行全局中间件
+		Middleware::globals();
+		//解析路由
+		require ROOT_PATH . '/system/routes.php';
+		Route::dispatch();
 	}
 
 	//定义常量

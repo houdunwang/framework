@@ -33,19 +33,26 @@ if ( ! function_exists( 'u' ) ) {
 		if ( empty( $path ) || preg_match( '@^http@i', $path ) ) {
 			return $path;
 		}
-		//URL请求参数
-		$urlParam = explode( '/', $_GET[ c( 'http.url_var' ) ] );
-		$path     = str_replace( '.', '/', $path );
-		switch ( count( explode( '/', $path ) ) ) {
-			case 2:
-				$path = $urlParam[0] . '/' . $path;
-				break;
-			case 1:
-				$path = $urlParam[0] . '/' . $urlParam[1] . '/' . $path;
-				break;
-		}
 		$url = C( 'http.rewrite' ) ? __ROOT__ : __ROOT__ . '/' . basename( $_SERVER['SCRIPT_FILENAME'] );
-		$url .= '?' . c( 'http.url_var' ) . '=' . $path;
+		if ( defined( 'MODULE' ) ) {
+			//控制器访问模式
+			//URL请求参数
+			$urlParam = explode( '/', $_GET[ c( 'http.url_var' ) ] );
+			$path     = str_replace( '.', '/', $path );
+			switch ( count( explode( '/', $path ) ) ) {
+				case 2:
+					$path = $urlParam[0] . '/' . $path;
+					break;
+				case 1:
+					$path = $urlParam[0] . '/' . $urlParam[1] . '/' . $path;
+					break;
+			}
+
+			$url .= '?' . c( 'http.url_var' ) . '=' . $path;
+		} else {
+			//路由访问模式
+			$url .= $path;
+		}
 		//添加参数
 		if ( ! empty( $args ) ) {
 			$url .= '&' . http_build_query( $args );
@@ -71,6 +78,7 @@ if ( ! function_exists( '_404' ) ) {
 if ( ! function_exists( 'p' ) ) {
 	/**
 	 * 打印输出数据
+	 *
 	 * @param $var
 	 */
 	function p( $var ) {
@@ -81,6 +89,7 @@ if ( ! function_exists( 'p' ) ) {
 if ( ! function_exists( 'dd' ) ) {
 	/**
 	 * 打印数据有数据类型
+	 *
 	 * @param $var
 	 */
 	function dd( $var ) {
@@ -93,6 +102,7 @@ if ( ! function_exists( 'dd' ) ) {
 if ( ! function_exists( 'go' ) ) {
 	/**
 	 * 跳转网址
+	 *
 	 * @param string $url url地址
 	 * @param int $time 等待时间
 	 * @param string $msg 提示信息
@@ -125,6 +135,7 @@ if ( ! function_exists( 'print_const' ) ) {
 if ( ! function_exists( 'v' ) ) {
 	/**
 	 * 全局变量
+	 *
 	 * @param null $name 变量名
 	 * @param string $value 变量值
 	 *
@@ -246,6 +257,7 @@ if ( ! function_exists( 'csrf_field' ) ) {
 if ( ! function_exists( 'method_field' ) ) {
 	/**
 	 * CSRF 表单
+	 *
 	 * @param $type
 	 *
 	 * @return string

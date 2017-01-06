@@ -3,6 +3,7 @@ return [
 	//服务提供者
 	'providers' => [
 		'houdunwang\error\ErrorProvider',
+		'houdunwang\session\SessionProvider',
 		'houdunwang\config\ConfigProvider',
 		'houdunwang\loader\LoaderProvider',
 		'houdunwang\backup\BackupProvider',
@@ -28,7 +29,6 @@ return [
 		'houdunwang\mail\MailProvider',
 		'houdunwang\html\HtmlProvider',
 		'houdunwang\crypt\CryptProvider',
-		'houdunwang\session\SessionProvider',
 		'houdunwang\lang\LangProvider',
 		'houdunwang\rbac\RbacProvider',
 		'houdunwang\request\RequestProvider',
@@ -45,7 +45,7 @@ return [
 
 	//服务外观
 	'facades'   => [
-		'App'        => 'houdunwang\kernel\AppFacade',
+		'App'        => 'houdunwang\framework\AppFacade',
 		'Backup'     => 'houdunwang\backup\BackupFacade',
 		'Cache'      => 'houdunwang\cache\CacheFacade',
 		'Loader'     => 'houdunwang\loader\LoaderFacade',

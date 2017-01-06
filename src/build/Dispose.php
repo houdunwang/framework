@@ -9,7 +9,10 @@ class Dispose {
 		'database',
 		'crypt',
 		'cookie',
-		'view'
+		'view',
+		'controller',
+		'route',
+		'middleware'
 	];
 
 	//初始化配置
@@ -90,6 +93,23 @@ class Dispose {
 	}
 
 	protected static function view() {
-		Config::set( 'view.compile_open', ! Config::get( 'app.debug' ) );
+		Config::set( 'view.compile_open', Config::get( 'app.debug' ) );
+	}
+
+	protected static function controller() {
+		Config::set( 'controller.app', Config::get( 'app.path' ) );
+	}
+
+	protected static function route() {
+		Config::set( 'route.cache', Config::get( 'http.route_cache' ) );
+	}
+
+	protected static function middleware() {
+		//添加全局中间件
+		$config = array_merge( c( 'middleware.global' ), [
+			'houdunwang\framework\middleware\Validate',
+			'houdunwang\framework\middleware\Csrf'
+		] );
+		c( 'middleware.global', array_unique( $config ) );
 	}
 }
