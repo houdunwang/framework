@@ -13,7 +13,7 @@ use houdunwang\framework\build\Base;
 class App {
 	protected $link;
 	public function __construct(){
-		define( 'FRAMEWORK_VERSION', '3.1.0' );
+		define( 'FRAMEWORK_VERSION', '3.0.35' );
 	}
 	//更改缓存驱动
 	protected function driver() {
