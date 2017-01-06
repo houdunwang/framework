@@ -61,7 +61,6 @@ class Base extends \houdunwang\container\build\Base {
 
 	//定义常量
 	protected function constant() {
-		define( 'FRAMEWORK_VERSION', '3.1.0' );
 		define( '__ROOT__', PHP_SAPI == 'cli' ? '' : trim( 'http://' . $_SERVER['HTTP_HOST'] . dirname( $_SERVER['SCRIPT_NAME'] ), '/\\' ) );
 		define( 'DS', DIRECTORY_SEPARATOR );
 	}

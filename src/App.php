@@ -12,7 +12,9 @@ use houdunwang\framework\build\Base;
 
 class App {
 	protected $link;
-
+	public function __construct(){
+		define( 'FRAMEWORK_VERSION', '3.1.0' );
+	}
 	//更改缓存驱动
 	protected function driver() {
 		$this->link = new Base();
