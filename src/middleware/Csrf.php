@@ -26,7 +26,7 @@ class Csrf {
 					//存在过滤的验证时忽略验证
 					$except = Config::get( 'csrf.except' );
 					foreach ( (array) $except as $f ) {
-						if ( preg_match( "@$f@", __URL__ ) ) {
+						if ( preg_match( "@$f@i", __URL__ ) ) {
 							return;
 						}
 					}
