@@ -8,7 +8,7 @@ class Validate {
 	//执行中间件
 	public function run() {
 		//分配表单验证数据
-		View::with( 'errors', Session::flash( 'errors' ) );
+		View::with( 'errors', Session::get( 'errors' ) ?: [ ] );
 		Session::del( 'errors' );
 	}
 }
