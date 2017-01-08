@@ -201,7 +201,7 @@ if ( ! function_exists( 'message' ) ) {
 			ajax( [ 'valid' => $type == 'success' ? 1 : 0, 'message' => $content ] );
 		} else {
 			switch ( $redirect ) {
-				case 'error':
+				case 'with':
 					\Session::set( 'errors', is_array( $content ) ? $content : [ $content ] );
 					echo '<script>location.href="' . $_SERVER['HTTP_REFERER'] . '";</script>';
 					exit;
