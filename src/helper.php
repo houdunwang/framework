@@ -96,6 +96,7 @@ if ( ! function_exists( 'dd' ) ) {
 		ob_start();
 		var_dump( $var );
 		echo "<pre>" . ob_get_clean() . "</pre>";
+		exit;
 	}
 }
 
