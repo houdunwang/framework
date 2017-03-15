@@ -7,16 +7,23 @@
  * |    WeChat: aihoudun
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
-if ( ! function_exists( 'nopic' ) ) {
+if ( ! function_exists( 'pic' ) ) {
 	/**
-	 * 模板中显示默认图片
+	 * 显示图片
+	 * 判断提供的图片文件是否合法
+	 * 不是合法图片时返回默认图片替换
 	 *
 	 * @param $file
+	 * @param string $pic
 	 *
 	 * @return string
 	 */
-	function nopic( $file ) {
-		return is_file( $file ) ? $file : 'resource/images/nopic.jpg';
+	function pic( $file, $pic = 'resource/images/thumb.jpg' ) {
+		if ( empty( $file ) || ! is_file( $file ) ) {
+			return __ROOT__ . '/' . $pic;
+		} else {
+			return __ROOT__ . '/' . $file;
+		}
 	}
 }
 
