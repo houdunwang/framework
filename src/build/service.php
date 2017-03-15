@@ -42,6 +42,7 @@ return [
 		'houdunwang\zip\ZipProvider',
 		'houdunwang\page\PageProvider',
 		'houdunwang\cart\CartProvider',
+		'houdunwang\qrcode\QrCodeProvider',
 	],
 
 	//服务外观
@@ -86,5 +87,6 @@ return [
 		'Zip'        => 'houdunwang\zip\ZipFacade',
 		'Page'       => 'houdunwang\page\PageFacade',
 		'Cart'       => 'houdunwang\cart\CartFacade',
+		'QrCode'     => 'houdunwang\qrcode\QrCodeFacade',
 	]
 ];
