@@ -7,6 +7,31 @@
  * |    WeChat: aihoudun
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
+
+if ( ! function_exists( 'env' ) ) {
+	/**
+	 * 根据.env配置文件获取匹配项
+	 *
+	 * @param $name 配置名称
+	 * @param $value 为空时的返回值
+	 *
+	 * @return mixed
+	 */
+	function env( $name, $value ) {
+		$envConfig = [];
+		if ( is_file( '.env' ) && empty( $envConfig ) ) {
+			$parse = file_get_contents( '.env' );
+			$data  = array_filter( preg_split( '@' . PHP_EOL . '@', $parse ) );
+			foreach ( $data as $v ) {
+				$info                          = explode( '=', $v );
+				$envConfig[ trim( $info[0] ) ] = trim( $info[1] );
+			}
+		}
+
+		return empty( $envConfig[ $name ] ) ? $value : $envConfig[ $name ];
+	}
+}
+
 if ( ! function_exists( 'pic' ) ) {
 	/**
 	 * 显示图片
@@ -19,7 +44,9 @@ if ( ! function_exists( 'pic' ) ) {
 	 * @return string
 	 */
 	function pic( $file, $pic = 'resource/images/thumb.jpg' ) {
-		if ( empty( $file ) || ! is_file( $file ) ) {
+		if ( preg_match( '@^http@i', $file ) ) {
+			return $file;
+		} elseif ( empty( $file ) || ! is_file( $file ) ) {
 			return __ROOT__ . '/' . $pic;
 		} else {
 			return __ROOT__ . '/' . $file;
@@ -36,7 +63,7 @@ if ( ! function_exists( 'u' ) ) {
 	 *
 	 * @return mixed|string
 	 */
-	function u( $path, $args = [ ] ) {
+	function u( $path, $args = [] ) {
 		if ( empty( $path ) || preg_match( '@^http@i', $path ) ) {
 			return $path;
 		}
@@ -66,6 +93,33 @@ if ( ! function_exists( 'u' ) ) {
 		}
 
 		return $url;
+	}
+}
+if ( ! function_exists( 'url_del' ) ) {
+	/**
+	 * 从__URL__地址中删除指令的$_GET参数
+	 *
+	 * @param string|array $args
+	 *
+	 * @return string
+	 */
+	function url_del( $args ) {
+		if ( ! is_array( $args ) ) {
+			$args = [ $args ];
+		}
+		$url = parse_url( __URL__ );
+		parse_str( $url['query'], $output );
+		foreach ( $args as $v ) {
+			if ( isset( $output[ $v ] ) ) {
+				unset( $output[ $v ] );
+			}
+		}
+		$url = $url['scheme'] . '://' . $url['host'] . $url['path'] . '?';
+		foreach ( $output as $k => $v ) {
+			$url .= $k . '=' . $v . '&';
+		}
+
+		return trim( $url, '&' );
 	}
 }
 
@@ -150,7 +204,7 @@ if ( ! function_exists( 'v' ) ) {
 	 * @return array|mixed|null|string
 	 */
 	function v( $name = null, $value = '[null]' ) {
-		static $vars = [ ];
+		static $vars = [];
 		if ( is_null( $name ) ) {
 			return $vars;
 		} else if ( $value == '[null]' ) {
@@ -170,7 +224,7 @@ if ( ! function_exists( 'v' ) ) {
 			$tmp = &$vars;
 			foreach ( explode( '.', $name ) as $d ) {
 				if ( ! isset( $tmp[ $d ] ) ) {
-					$tmp[ $d ] = [ ];
+					$tmp[ $d ] = [];
 				}
 				$tmp = &$tmp[ $d ];
 			}

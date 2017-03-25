@@ -7,7 +7,6 @@ return [
 		'houdunwang\middleware\MiddlewareProvider',
 		'houdunwang\view\ViewProvider',
 		'houdunwang\route\RouteProvider',
-
 		'houdunwang\session\SessionProvider',
 		'houdunwang\config\ConfigProvider',
 		'houdunwang\loader\LoaderProvider',
