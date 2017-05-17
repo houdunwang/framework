@@ -22,26 +22,6 @@ if ( ! function_exists('app')) {
         return \App::make($name);
     }
 }
-if ( ! function_exists('env')) {
-    /**
-     * 根据.env配置文件获取匹配项
-     *
-     * @param $name  配置名称
-     * @param $value 为空时的返回值
-     *
-     * @return mixed
-     */
-    function env($name, $value)
-    {
-        static $path = null;
-        if (is_null($path)) {
-            $path = is_file(ROOT_PATH.'/.env') ? ROOT_PATH : __DIR__;
-        }
-        (new \Dotenv\Dotenv($path))->load();
-
-        return getenv($name) ?: $value;
-    }
-}
 
 if ( ! function_exists('pic')) {
     /**
@@ -191,16 +171,19 @@ if ( ! function_exists('go')) {
     function go($url, $time = 0, $msg = '')
     {
         $url = u($url);
-        if ( ! headers_sent()) {
-            $time == 0
-                ? header("Location:".$url)
-                : header(
-                "refresh:{$time};url={$url}"
-            );
-        } else {
-            echo "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
+//        if ( ! headers_sent()) {
+//            $time == 0
+//                ? header("Location:".$url)
+//                : header(
+//                "refresh:{$time};url={$url}"
+//            );
+//        } else {
+//            echo "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
+//        }
+        echo "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
+        if ($msg) {
+//            die($msg);
         }
-        die($msg);
     }
 }
 

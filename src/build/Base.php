@@ -14,10 +14,13 @@ use ReflectionClass;
 class Base extends \houdunwang\container\build\Base
 {
     use Initial, Middleware;
+
     //应用已启动
     protected $booted = false;
+
     //延迟加载服务提供者
     protected $deferProviders = [];
+
     //已加载服务提供者
     protected $serviceProviders = [];
 
@@ -70,11 +73,8 @@ class Base extends \houdunwang\container\build\Base
                 $this->register(new $provider($this));
             } else {
                 //延迟加载服务
-                $alias                        = substr(
-                    $reflectionClass->getShortName(),
-                    0,
-                    -8
-                );
+                $alias                        = substr($reflectionClass->getShortName(),
+                    0, -8);
                 $this->deferProviders[$alias] = $provider;
             }
         }

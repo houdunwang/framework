@@ -12,6 +12,7 @@ namespace houdunwang\framework\build;
 
 use houdunwang\framework\middleware\App;
 use houdunwang\framework\middleware\Cli;
+use houdunwang\framework\middleware\Controller;
 use houdunwang\framework\middleware\Cookie;
 use houdunwang\framework\middleware\Csrf;
 use houdunwang\framework\middleware\Globals;
@@ -19,6 +20,7 @@ use houdunwang\framework\middleware\Request;
 use houdunwang\framework\middleware\Route;
 use houdunwang\framework\middleware\Session;
 use houdunwang\framework\middleware\View;
+use houdunwang\framework\middleware\ViewParseFile;
 
 /**
  * Class Middleware
@@ -28,6 +30,9 @@ use houdunwang\framework\middleware\View;
 trait Middleware
 {
     //中间件
+    /**
+     * @var array
+     */
     protected $middlewarte
         = [
             App::class,
@@ -44,6 +49,7 @@ trait Middleware
      */
     protected function middleware()
     {
+        $this->configMiddleware();
         $middleware = array_merge(
             $this->middlewarte,
             Config::get('middleware.global'),
@@ -59,6 +65,9 @@ trait Middleware
         $dispatcher();
     }
 
+    /**
+     * @return \Closure
+     */
     protected function getSlice()
     {
         return function ($next, $step) {
@@ -66,5 +75,13 @@ trait Middleware
                 return call_user_func_array([new $step, 'run'], [$next]);
             };
         };
+    }
+
+    /**
+     *
+     */
+    protected function configMiddleware(){
+        \houdunwang\middleware\Middleware::add('controller_start',[Controller::class]);
+        \houdunwang\middleware\Middleware::add('view_parse_file',[ViewParseFile::class]);
     }
 }

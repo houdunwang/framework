@@ -24,8 +24,8 @@ class Route implements Middleware
             Config::set('route.cache', Config::get('http.route_cache'));
             //解析路由
             require ROOT_PATH.'/system/routes.php';
-            \Route::dispatch();
-            $this->parse();
+            echo \Route::bootstrap()->getContent();
+//            $this->parse();
         }
         $next();
     }
@@ -38,6 +38,7 @@ class Route implements Middleware
     {
         if (RUN_MODE == 'HTTP') {
             $result = \Route::getResult();
+            print_r($result);
             if (is_array($result)) {
                 echo json_encode($result, JSON_UNESCAPED_UNICODE);
             }
