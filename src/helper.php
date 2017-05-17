@@ -191,19 +191,16 @@ if ( ! function_exists('go')) {
     function go($url, $time = 0, $msg = '')
     {
         $url = u($url);
-//        if ( ! headers_sent()) {
-//            $time == 0
-//                ? header("Location:".$url)
-//                : header(
-//                "refresh:{$time};url={$url}"
-//            );
-//        } else {
-//            echo "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
-//        }
-        echo "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
-        if ($msg) {
-//            die($msg);
+        if ( ! headers_sent()) {
+            $time == 0
+                ? header("Location:".$url)
+                : header(
+                "refresh:{$time};url={$url}"
+            );
+        } else {
+            echo "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
         }
+        die($msg);
     }
 }
 
