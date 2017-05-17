@@ -370,3 +370,27 @@ if ( ! function_exists('csrf_token')) {
         return Session::get('csrf_token');
     }
 }
+
+if ( ! function_exists('view_path')) {
+    /**
+     * 模板目录
+     *
+     * @return string
+     */
+    function view_path()
+    {
+        return dirname(\houdunwang\view\View::getFile());
+    }
+}
+
+if ( ! function_exists('view_url')) {
+    /**
+     * 模板目录链接
+     *
+     * @return string
+     */
+    function view_url()
+    {
+        return __ROOT__.'/'.dirname(\houdunwang\view\View::getFile());
+    }
+}
