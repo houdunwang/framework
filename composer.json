@@ -22,7 +22,6 @@
     "houdunwang/config": "~1.0",
     "houdunwang/oss": "~1.0",
     "houdunwang/container": "~1.0",
-    "houdunwang/controller": "~1.0",
     "houdunwang/cookie": "~1.0",
     "houdunwang/crypt": "~1.0",
     "houdunwang/curl": "~1.0",
