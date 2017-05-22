@@ -128,7 +128,7 @@ if ( ! function_exists('_404')) {
     {
         \Response::sendHttpStatus(404);
         if (RUN_MODE == 'HTTP' && is_file(c('app.404'))) {
-            die(view(c('app.404')));
+            return view(c('app.404'));
         }
     }
 }
@@ -155,8 +155,7 @@ if ( ! function_exists('dd')) {
     {
         ob_start();
         var_dump($var);
-        echo "<pre>".ob_get_clean()."</pre>";
-        exit;
+        die("<pre>".ob_get_clean()."</pre>");
     }
 }
 
@@ -235,12 +234,14 @@ if ( ! function_exists('confirm')) {
      * @param string $message 提示文字
      * @param string $sUrl    确定按钮跳转的url
      * @param string $eUrl    取消按钮跳转的url
+     *
+     * @return mixed
      */
     function confirm($message, $sUrl, $eUrl)
     {
         View::with(['message' => $message, 'sUrl' => $sUrl, 'eUrl' => $eUrl]);
-        echo view(Config::get('app.confirm'));
-        exit;
+
+        return view(Config::get('app.confirm'));
     }
 }
 
@@ -248,28 +249,23 @@ if ( ! function_exists('message')) {
     /**
      * 消息提示
      *
-     * @param string $content  消息内容
+     * @param        $content  消息内容
      * @param string $redirect 跳转地址有三种方式 1:back(返回上一页)  2:refresh(刷新当前页)  3:具体Url
      * @param string $type     信息类型  success(成功），error(失败），warning(警告），info(提示）
      * @param int    $timeout  等待时间
+     *
+     * @return mixed|string
      */
     function message($content, $redirect = 'back', $type = 'success', $timeout = 2)
     {
         if (IS_AJAX) {
-            return ajax(
-                ['valid' => $type == 'success' ? 1 : 0, 'message' => $content]
-            );
+            return ['valid' => $type == 'success' ? 1 : 0, 'message' => $content];
         } else {
             switch ($redirect) {
                 case 'with':
-                    \Session::set(
-                        'errors',
-                        is_array($content) ? $content : [$content]
-                    );
-                    echo '<script>location.href="'.$_SERVER['HTTP_REFERER']
-                         .'";</script>';
-                    exit;
-                    break;
+                    \Session::flash('errors', is_array($content) ? $content : [$content]);
+
+                    return '<script>location.href="'.$_SERVER['HTTP_REFERER'].'";</script>';
                 case 'back':
                     //有回调地址时回调,没有时返回主页
                     $url = "window.history.go(-1)";
@@ -300,19 +296,17 @@ if ( ! function_exists('message')) {
                     $ico = 'fa-warning';
                     break;
             }
-            View::with(
-                [
-                    'content'  => $content,
-                    'redirect' => $redirect,
-                    'type'     => $type,
-                    'url'      => $url,
-                    'ico'      => $ico,
-                    'timeout'  => $timeout * 1000,
-                ]
-            );
-            echo view(Config::get('app.message'))->toString();
+            View::with([
+                'content'  => $content,
+                'redirect' => $redirect,
+                'type'     => $type,
+                'url'      => $url,
+                'ico'      => $ico,
+                'timeout'  => $timeout * 1000,
+            ]);
+
+            return view(Config::get('app.message'));
         }
-        exit;
     }
 }
 
