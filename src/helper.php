@@ -164,26 +164,15 @@ if ( ! function_exists('go')) {
     /**
      * 跳转网址
      *
-     * @param string $url  url地址
-     * @param int    $time 等待时间
-     * @param string $msg  提示信息
+     * @param $url
+     *
+     * @return string
      */
-    function go($url, $time = 0, $msg = '')
+    function go($url)
     {
         $url = u($url);
-//        if ( ! headers_sent()) {
-//            $time == 0
-//                ? header("Location:".$url)
-//                : header(
-//                "refresh:{$time};url={$url}"
-//            );
-//        } else {
-//            echo "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
-//        }
-        echo "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
-        if ($msg) {
-//            die($msg);
-        }
+
+        return "<meta http-equiv='Refresh' content='0;URL={$url}'>";
     }
 }
 
@@ -264,14 +253,10 @@ if ( ! function_exists('message')) {
      * @param string $type     信息类型  success(成功），error(失败），warning(警告），info(提示）
      * @param int    $timeout  等待时间
      */
-    function message(
-        $content,
-        $redirect = 'back',
-        $type = 'success',
-        $timeout = 2
-    ) {
+    function message($content, $redirect = 'back', $type = 'success', $timeout = 2)
+    {
         if (IS_AJAX) {
-            ajax(
+            return ajax(
                 ['valid' => $type == 'success' ? 1 : 0, 'message' => $content]
             );
         } else {
@@ -282,7 +267,7 @@ if ( ! function_exists('message')) {
                         is_array($content) ? $content : [$content]
                     );
                     echo '<script>location.href="'.$_SERVER['HTTP_REFERER']
-                        .'";</script>';
+                         .'";</script>';
                     exit;
                     break;
                 case 'back':
@@ -356,7 +341,7 @@ if ( ! function_exists('method_field')) {
     function method_field($type)
     {
         return "<input type='hidden' name='_method' value='".strtoupper($type)
-            ."'/>\r\n";
+               ."'/>\r\n";
     }
 }
 if ( ! function_exists('csrf_token')) {
