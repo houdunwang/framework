@@ -57,30 +57,27 @@ if ( ! function_exists('u')) {
      */
     function u($path, $args = [])
     {
-        if (empty($path) || preg_match('@^http@i', $path)) {
+        if (preg_match('@^http@i', $path)) {
             return $path;
         }
-        $url = C('http.rewrite')
-            ? __ROOT__
-            : __ROOT__.'/'.basename(
-                $_SERVER['SCRIPT_FILENAME']
-            );
-        if (defined('MODULE')) {
+        $url        = c('http.rewrite') ? __ROOT__ : __ROOT__.'/'.basename($_SERVER['SCRIPT_FILENAME']);
+        $path       = str_replace('.', '/', $path);
+        $controller = \houdunwang\route\Route::getController();
+        if (empty($controller)) {
+            //路由访问模式
+            $url .= '?'.c('http.url_var').'='.$path;
+        } else {
+            $info = explode('\\', $controller);
             //控制器访问模式
-            //URL请求参数
-            $path = str_replace('.', '/', $path);
             switch (count(explode('/', $path))) {
                 case 2:
-                    $path = MODULE.'/'.$path;
+                    $path = $info[1].'/'.$path;
                     break;
                 case 1:
-                    $path = MODULE.'/'.CONTROLLER.'/'.$path;
+                    $path = $info[1].'/'.$info[3].'/'.$path;
                     break;
             }
 
-            $url .= '?'.c('http.url_var').'='.$path;
-        } else {
-            //路由访问模式
             $url .= '?'.c('http.url_var').'='.$path;
         }
         //添加参数
@@ -169,9 +166,7 @@ if ( ! function_exists('go')) {
      */
     function go($url)
     {
-        $url = u($url);
-
-        return "<meta http-equiv='Refresh' content='0;URL={$url}'>";
+        header('location:'.u($url));
     }
 }
 
@@ -259,7 +254,9 @@ if ( ! function_exists('message')) {
     function message($content, $redirect = 'back', $type = 'success', $timeout = 2)
     {
         if (IS_AJAX) {
-            return ['valid' => $type == 'success' ? 1 : 0, 'message' => $content];
+            $data = ['valid' => $type == 'success' ? 1 : 0, 'message' => $content];
+
+            return json_encode($data, JSON_UNESCAPED_UNICODE);
         } else {
             switch ($redirect) {
                 case 'with':
@@ -267,7 +264,6 @@ if ( ! function_exists('message')) {
 
                     return '<script>location.href="'.$_SERVER['HTTP_REFERER'].'";</script>';
                 case 'back':
-                    //有回调地址时回调,没有时返回主页
                     $url = "window.history.go(-1)";
                     break;
                 case 'refresh':
@@ -350,18 +346,6 @@ if ( ! function_exists('csrf_token')) {
     }
 }
 
-if ( ! function_exists('view_path')) {
-    /**
-     * 模板目录
-     *
-     * @return string
-     */
-    function view_path()
-    {
-        return dirname(\houdunwang\view\View::getFile());
-    }
-}
-
 if ( ! function_exists('view_url')) {
     /**
      * 模板目录链接
@@ -370,6 +354,6 @@ if ( ! function_exists('view_url')) {
      */
     function view_url()
     {
-        return __ROOT__.'/'.dirname(\houdunwang\view\View::getFile());
+        return __ROOT__.'/'.view_path();
     }
 }

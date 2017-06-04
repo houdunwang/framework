@@ -44,14 +44,8 @@ trait Initial
 
         //加载配置文件
         Config::loadFiles(ROOT_PATH.'/system/config');
-        $this->providers = array_merge(
-            $servers['providers'],
-            Config::get('service.providers')
-        );
-        $this->facades   = array_merge(
-            $servers['facades'],
-            Config::get('service.facades')
-        );
+        $this->providers = array_merge($servers['providers'], Config::get('service.providers'));
+        $this->facades   = array_merge($servers['facades'], Config::get('service.facades'));
         //设置时区
         date_default_timezone_set(Config::get('app.timezone'));
     }
@@ -62,23 +56,11 @@ trait Initial
     protected function constant()
     {
         if ( ! defined('__ROOT__')) {
-            define(
-                '__ROOT__',
-                RUN_MODE != 'HTTP'
-                    ? ''
-                    : trim(
-                    'http://'.$_SERVER['HTTP_HOST']
-                    .dirname($_SERVER['SCRIPT_NAME']),
-                    '/\\'
-                )
-            );
+            define('__ROOT__', RUN_MODE != 'HTTP'
+                ? '' : trim('http://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['SCRIPT_NAME']), '/\\'));
         }
         if ( ! defined('__WEB__')) {
-            define(
-                '__WEB__',
-                Config::get('http.rewrite')
-                    ? __ROOT__ : __ROOT__.'/index.php'
-            );
+            define('__WEB__', Config::get('http.rewrite') ? __ROOT__ : __ROOT__.'/index.php');
         }
         //根目录即Vendor同级目录
         define('ROOT_PATH', realpath(dirname(__DIR__).'/../../../..'));

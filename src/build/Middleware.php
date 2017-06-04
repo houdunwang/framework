@@ -80,8 +80,9 @@ trait Middleware
     /**
      *
      */
-    protected function configMiddleware(){
-        \houdunwang\middleware\Middleware::add('controller_start',[Controller::class]);
-        \houdunwang\middleware\Middleware::add('view_parse_file',[ViewParseFile::class]);
+    protected function configMiddleware()
+    {
+        \houdunwang\middleware\Middleware::add('controller_start', [Controller::class]);
+        \houdunwang\middleware\Middleware::add('view_parse_file', [ViewParseFile::class]);
     }
 }

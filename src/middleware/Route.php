@@ -22,8 +22,10 @@ class Route implements Middleware
         if (RUN_MODE == 'HTTP') {
             Config::set('controller.app', Config::get('app.path'));
             Config::set('route.cache', Config::get('http.route_cache'));
+
             //解析路由
             require ROOT_PATH.'/system/routes.php';
+
             $content = \Route::bootstrap()->getContent();
             if (is_array($content)) {
                 echo json_encode($content, JSON_UNESCAPED_UNICODE);
@@ -34,26 +36,5 @@ class Route implements Middleware
             }
         }
         $next();
-    }
-
-    /**
-     * 处理解析结果
-     *
-     */
-    protected function parse()
-    {
-        if (RUN_MODE == 'HTTP') {
-            $result = \Route::getResult();
-            print_r($result);
-            if (is_array($result)) {
-                echo json_encode($result, JSON_UNESCAPED_UNICODE);
-            }
-            if (is_string($result)) {
-                echo $result;
-            }
-            if ($result instanceof ViewBase) {
-                echo \View::toString();
-            }
-        }
     }
 }
