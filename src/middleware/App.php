@@ -23,6 +23,6 @@ class App implements Middleware
     //框架版本
     protected function version()
     {
-        define('HDPHP_VERSION', '3.0.95');
+        define('HDPHP_VERSION', '3.0.105');
     }
 }

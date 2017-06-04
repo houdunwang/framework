@@ -87,6 +87,6 @@ return [
         'Page'       => 'houdunwang\page\PageFacade',
         'Cart'       => 'houdunwang\cart\CartFacade',
         'QrCode'     => 'houdunwang\qrcode\QrCodeFacade',
-        \houdunwang\aliyunsms\SmsFacade::class,
+        'Sms'        => \houdunwang\aliyunsms\SmsFacade::class,
     ],
 ];
