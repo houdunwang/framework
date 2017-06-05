@@ -18,7 +18,7 @@ class Cli implements Middleware
     public function run($next)
     {
         \houdunwang\cli\Cli::setPath([
-            'controller' => 'app/controller',
+            'controller' => 'app',
             'middleware' => 'system/middleware',
             'model'      => 'system/model',
             'request'    => 'system/request',
