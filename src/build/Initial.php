@@ -13,7 +13,6 @@ namespace houdunwang\framework\build;
 use houdunwang\config\Config;
 use houdunwang\error\Error;
 use houdunwang\loader\Loader;
-
 trait Initial
 {
     //系统服务

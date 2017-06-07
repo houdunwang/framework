@@ -56,12 +56,7 @@ trait Middleware
             [Route::class]
         );
         $middleware = array_reverse($middleware);
-        $dispatcher = array_reduce(
-            $middleware,
-            $this->getSlice(),
-            function () {
-            }
-        );
+        $dispatcher = array_reduce($middleware, $this->getSlice(), function () {});
         $dispatcher();
     }
 
