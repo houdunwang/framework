@@ -7,31 +7,6 @@
  * |    WeChat: aihoudun
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
-if ( ! function_exists('root_url')) {
-    /**
-     * 网站根地址URI
-     *
-     * @return string
-     */
-    function root_url()
-    {
-        return trim('http://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['SCRIPT_NAME']), '/\\');
-    }
-}
-
-if ( ! function_exists('web_url')) {
-    /**
-     * 网站主页
-     * 根据配置项 http.rewrite判断
-     * 没有开启伪静态时添加index.php入口文件
-     *
-     * @return string
-     */
-    function web_url()
-    {
-        return Config::get('http.rewrite') ? __ROOT__ : __ROOT__.'/index.php';
-    }
-}
 if ( ! function_exists('app')) {
     /**
      * 获取应用实例
