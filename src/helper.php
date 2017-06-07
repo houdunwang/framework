@@ -291,7 +291,7 @@ if ( ! function_exists('message')) {
                     break;
             }
             View::with([
-                'content'  => $content,
+                'content'  => is_array($content)?implode('<br/>',$content):$content,
                 'redirect' => $redirect,
                 'type'     => $type,
                 'url'      => $url,
