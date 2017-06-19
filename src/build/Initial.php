@@ -37,10 +37,8 @@ trait Initial
     {
         //加载.env文件
         Config::env('.env');
-
         //加载服务配置项
         $servers = require __DIR__.'/../build/service.php';
-
         //加载配置文件
         Config::loadFiles(ROOT_PATH.'/system/config');
         $this->providers = array_merge($servers['providers'], Config::get('service.providers'));

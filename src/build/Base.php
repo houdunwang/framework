@@ -26,6 +26,7 @@ class Base extends \houdunwang\container\build\Base
 
     public function bootstrap()
     {
+        define('RUNTIME', $_SERVER['REQUEST_TIME_FLOAT']);
         $this->init();
         $this->instance('App', $this);
         //设置外观类APP属性
