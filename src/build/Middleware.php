@@ -41,7 +41,6 @@ trait Middleware
             Session::class,
             Request::class,
             Csrf::class,
-            View::class,
         ];
 
     /**
@@ -53,10 +52,11 @@ trait Middleware
         $middleware = array_merge(
             $this->middlewarte,
             Config::get('middleware.global'),
-            [Route::class]
+            [View::class, Route::class]
         );
         $middleware = array_reverse($middleware);
-        $dispatcher = array_reduce($middleware, $this->getSlice(), function () {});
+        $dispatcher = array_reduce($middleware, $this->getSlice(), function () {
+        });
         $dispatcher();
     }
 
