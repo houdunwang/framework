@@ -17,7 +17,7 @@ class View implements Middleware
 {
     public function run($next)
     {
-        Config::set('view.compile_open', Config::get('app.debug'));
+        Config::set('view.debug', Config::get('app.debug'));
         //分配SESSION闪存中的错误信息
         \houdunwang\view\View::with('errors', \houdunwang\session\Session::flash('errors'));
 
