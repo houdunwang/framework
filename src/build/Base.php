@@ -9,12 +9,12 @@
 // | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
 // '-------------------------------------------------------------------
 
+use houdunwang\middleware\build\Dispatcher;
 use ReflectionClass;
 
 class Base extends \houdunwang\container\build\Base
 {
-    use Initial, Middleware;
-
+    use Bootstrap, Dispatcher;
     //应用已启动
     protected $booted = false;
 
@@ -24,10 +24,16 @@ class Base extends \houdunwang\container\build\Base
     //已加载服务提供者
     protected $serviceProviders = [];
 
+    //系统服务
+    protected $providers = [];
+
+    //外观别名
+    protected $facades = [];
+
     public function bootstrap()
     {
-        define('RUNTIME', $_SERVER['REQUEST_TIME_FLOAT']);
-        $this->init();
+        $this->services();
+        spl_autoload_register([$this, 'autoload']);
         $this->instance('App', $this);
         //设置外观类APP属性
         Facade::setFacadeApplication($this);
@@ -35,10 +41,30 @@ class Base extends \houdunwang\container\build\Base
         $this->bindServiceProvider();
         //执行服务启动程序
         $this->boot();
-        $this->middleware();
+        //运行项目应用
+        $this->runApp();
     }
 
-    //外观类文件自动加载
+    /**
+     * 服务设置
+     */
+    public function services()
+    {
+        define('ROOT_PATH', '.');
+        //加载服务配置项
+        $servers         = require __DIR__.'/../build/service.php';
+        $users           = require ROOT_PATH.'/system/config/service.php';
+        $this->providers = array_merge($servers['providers'], $users['providers']);
+        $this->facades   = array_merge($servers['facades'], $users['facades']);
+    }
+
+    /**
+     * 外观类文件自动加载
+     *
+     * @param $class
+     *
+     * @return mixed
+     */
     public function autoload($class)
     {
         //通过外观类加载系统服务
@@ -50,7 +76,9 @@ class Base extends \houdunwang\container\build\Base
         }
     }
 
-    //系统启动
+    /**
+     * 系统启动
+     */
     protected function boot()
     {
         if ($this->booted) {
@@ -74,8 +102,7 @@ class Base extends \houdunwang\container\build\Base
                 $this->register(new $provider($this));
             } else {
                 //延迟加载服务
-                $alias                        = substr($reflectionClass->getShortName(),
-                    0, -8);
+                $alias                        = substr($reflectionClass->getShortName(), 0, -8);
                 $this->deferProviders[$alias] = $provider;
             }
         }

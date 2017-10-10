@@ -16,7 +16,7 @@ namespace houdunwang\framework\build;
 abstract class Provider
 {
     //延迟加载
-    public $defer = true;
+    public $defer = false;
 
     //应用程序实例
     protected $app;

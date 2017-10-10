@@ -11,6 +11,8 @@
 namespace houdunwang\framework\middleware;
 
 use houdunwang\middleware\build\Middleware;
+use houdunwang\route\Route;
+use houdunwang\view\View;
 
 /**
  * 模板文件
@@ -23,11 +25,9 @@ class ViewParseFile implements Middleware
 {
     public function run($next)
     {
-        $file = \houdunwang\view\View::getFile();
-        if (empty($file)) {
-            $action = \houdunwang\route\Route::getAction();
-            if ($action) {
-                \houdunwang\view\View::setFile($action);
+        if (empty(View::getFile())) {
+            if ($action = Route::getAction()) {
+                View::setFile($action);
             }
         }
         $next();
