@@ -9,12 +9,13 @@
 // | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
 // '-------------------------------------------------------------------
 
+use houdunwang\framework\Version;
 use houdunwang\middleware\build\Dispatcher;
 use ReflectionClass;
 
 class Base extends \houdunwang\container\build\Base
 {
-    use Bootstrap, Dispatcher;
+    use Bootstrap, Dispatcher, Version;
     //应用已启动
     protected $booted = false;
 
@@ -32,6 +33,7 @@ class Base extends \houdunwang\container\build\Base
 
     public function bootstrap()
     {
+        self::version();
         $this->services();
         spl_autoload_register([$this, 'autoload']);
         $this->instance('App', $this);
