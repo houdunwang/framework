@@ -55,7 +55,8 @@
     "houdunwang/aliyunsms": "~1.0",
     "houdunwang/cloud": "~1.0",
     "vlucas/phpdotenv": "~2.0",
-    "houdunwang/alipay": "~1.0"
+    "houdunwang/alipay": "~1.0",
+    "houdunwang/aliyunlive": "~1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^6.1"
