@@ -56,7 +56,6 @@
     "houdunwang/cloud": "~1.0",
     "vlucas/phpdotenv": "~2.0",
     "houdunwang/alipay": "~1.0",
-    "houdunwang/aliyunlive": "~1.0",
     "houdunwang/queue": "~1.0",
     "houdunwang/aliyun": "~1.0",
     "workerman/gateway-worker": "^3.0"
