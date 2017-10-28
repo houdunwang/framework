@@ -12,6 +12,6 @@ trait Version
 {
     static public function version()
     {
-        defined('HDPHP_VERSION') or define('HDPHP_VERSION', '3.0.106');
+        defined('HDPHP_VERSION') or define('HDPHP_VERSION', '3.0.138');
     }
 }

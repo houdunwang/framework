@@ -58,7 +58,8 @@
     "houdunwang/alipay": "~1.0",
     "houdunwang/queue": "~1.0",
     "workerman/gateway-worker": "^3.0",
-    "houdunwang/aliyun": "~1.0"
+    "houdunwang/aliyun": "~1.0",
+    "houdunwang/unit": "~1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^6.1"
