@@ -32,9 +32,8 @@ trait Bootstrap
             //模板文件处理中间件
             Middleware::add('view_parse_file', [ViewParseFile::class]);
             //执行路由或控制器方法
-            if ($content = Route::bootstrap()->exec()) {
-                echo is_object($content) ? $content : Response::make($content);
-            }
+            $content = Route::bootstrap()->exec();
+            echo is_object($content) ? $content : Response::make($content);
         }
     }
 

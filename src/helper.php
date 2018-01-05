@@ -121,3 +121,35 @@ if ( ! function_exists('v')) {
         }
     }
 }
+
+/**
+ * 获取几分/几秒前的表示
+ *
+ * @param string $time 时间ISO格式如 2020-2-22 10:22:32
+ *
+ * @return int
+ */
+if ( ! function_exists('time_diff')) {
+    function time_diff($time)
+    {
+        $dt  = new \Carbon\Carbon($time);
+        $now = \Carbon\Carbon::now();
+        $num = $dt->diffInSeconds($now);
+        if ($num < 20) {
+            return '刚刚';
+        } elseif ($num < 60) {
+            $unit = '秒前';
+        } elseif ($num < 3600) {
+            $unit = '分钟';
+            $num  = $num / 60;
+        } else if ($num < (24 * 3600)) {
+            $unit = '小时前';
+            $num  = $num / 3600;
+        } else {
+            $unit = '天前';
+            $num  = $num / (24 * 3600);
+        }
+
+        return intval($num).$unit;
+    }
+}
