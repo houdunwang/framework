@@ -52,7 +52,7 @@ class Base extends \houdunwang\container\build\Base
      */
     public function services()
     {
-        define('ROOT_PATH', '.');
+        defined('ROOT_PATH') or define('ROOT_PATH', '.');
         //加载服务配置项
         $servers         = require __DIR__.'/../build/service.php';
         $users           = require ROOT_PATH.'/system/config/service.php';
@@ -70,11 +70,10 @@ class Base extends \houdunwang\container\build\Base
     public function autoload($class)
     {
         //通过外观类加载系统服务
-        $file   = str_replace('\\', '/', $class);
-        $facade = basename($file);
+        $facade = str_replace('\\', '/', $class);
         if (isset($this->facades[$facade])) {
             //加载facade类
-            return class_alias($this->facades[$facade], $class);
+            class_alias($this->facades[$facade], $class);
         }
     }
 

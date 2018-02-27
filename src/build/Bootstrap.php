@@ -14,6 +14,8 @@ namespace houdunwang\framework\build;
 use houdunwang\config\Config;
 use houdunwang\framework\middleware\ViewParseFile;
 use houdunwang\middleware\Middleware;
+use houdunwang\request\Request;
+use houdunwang\response\Response;
 use houdunwang\route\Route;
 use houdunwang\session\Session;
 use houdunwang\view\View;
