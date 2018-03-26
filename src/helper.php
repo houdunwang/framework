@@ -140,7 +140,7 @@ if ( ! function_exists('time_diff')) {
         } elseif ($num < 60) {
             $unit = '秒前';
         } elseif ($num < 3600) {
-            $unit = '分钟';
+            $unit = '分钟前';
             $num  = $num / 60;
         } else if ($num < (24 * 3600)) {
             $unit = '小时前';
