@@ -4,7 +4,6 @@ return [
     'providers' => [
         \houdunwang\config\ConfigProvider::class,
         \houdunwang\error\ErrorProvider::class,
-        \houdunwang\loader\LoaderProvider::class,
         \houdunwang\cli\CliProvider::class,
         \houdunwang\middleware\MiddlewareProvider::class,
         \houdunwang\session\SessionProvider::class,
@@ -49,7 +48,6 @@ return [
     'facades'   => [
         'Config'     => \houdunwang\config\ConfigFacade::class,
         'Errors'     => \houdunwang\error\ErrorFacade::class,
-        'Loader'     => \houdunwang\loader\LoaderFacade::class,
         'App'        => \houdunwang\framework\AppFacade::class,
         'Backup'     => \houdunwang\backup\BackupFacade::class,
         'Cache'      => \houdunwang\cache\CacheFacade::class,
